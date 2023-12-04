@@ -10,7 +10,7 @@ import SwiftUI
 import LanguageSupport
 import CodeEditorView
 
-struct MessageEntry: View {
+struct MessageEntry {
     @Binding var messages: Set<TextLocated<Message>>
     
     @Environment(\.presentationMode) private var presentationMode
@@ -20,75 +20,6 @@ struct MessageEntry: View {
     @State private var lineStr:   String           = ""
     @State private var columnStr: String           = ""
     @State private var message:   String           = ""
-    
-    var body: some View {
-        VStack(spacing: 16) {
-            
-            Text("Enter a message to display in the code view")
-            
-            Form {
-                
-                Section(header: Text("Essentials")) {
-                    
-                    Picker("", selection: $category) {
-                        Text("Live").tag(Message.Category.live)
-                        Text("Error").tag(Message.Category.error)
-                        Text("Warning").tag(Message.Category.warning)
-                        Text("Informational").tag(Message.Category.informational)
-                    }
-                    .padding([.top, .bottom], 4)
-                    
-                    TextField("Summary", text: $summary)
-                    
-#if os(iOS)
-                    HStack {
-                        TextField("Line", text: $lineStr)
-                        TextField("Column", text: $columnStr)
-                    }
-#elseif os(macOS)
-                    TextField("Line", text: $lineStr)
-                    TextField("Column", text: $columnStr)
-#endif
-                    Text("Line and column numbers start at 1.")
-                        .font(.system(.footnote))
-#if os(macOS)
-                        .padding([.bottom], 8)
-#endif
-                    
-                }
-                
-                Section(header: Text("Detailed message")) {
-                    TextEditor(text: $message)
-                        .frame(height: 100)
-                }
-                
-            }
-            HStack {
-                
-                Button("Cancel"){ presentationMode.wrappedValue.dismiss() }
-                    .keyboardShortcut(.cancelAction)
-                
-                Spacer()
-                
-                Button("Submit message"){
-                    
-                    let finalSummary = summary.count == 0 ? "Summary" : summary,
-                        line         = Int(lineStr) ?? 1,
-                        column       = Int(columnStr) ?? 1
-                    messages.insert(TextLocated(location: TextLocation(oneBasedLine: line, column: column),
-                                                entity: Message(category: category,
-                                                                length: 1,
-                                                                summary: finalSummary,
-                                                                description: NSAttributedString(string: message))))
-                    presentationMode.wrappedValue.dismiss()
-                    
-                }
-                .keyboardShortcut(.defaultAction)
-                
-            }
-        }
-        .padding(10)
-    }
 }
 
 struct ContentView: View {
@@ -119,8 +50,6 @@ struct ContentView: View {
                 .focused($editorIsFocused)
             }.toolbar {
                 HStack {
-                    Button("Add Message") { showMessageEntry = true }
-                        .sheet(isPresented: $showMessageEntry){ MessageEntry(messages: $messages) }
                     Link("Documentation", destination: URL(string: "https://cherrilang.org/language/")!)
                     Button("Config", systemImage: "gear", action: {
                         self.showPopover = true
@@ -158,22 +87,46 @@ struct ContentView: View {
         let data = pipe.fileHandleForReading.readDataToEndOfFile()
         let output = String(data: data, encoding: .utf8)!
         
-        print(output)
+        handleCompilerOutput(output: output)
     }
-}
-
-struct MessageEntry_Previews: PreviewProvider {
     
-    struct Container: View {
-        @State var messages: Set<TextLocated<Message>> = Set()
-        
-        var body: some View {
-            MessageEntry(messages: $messages)
-                .preferredColorScheme(.dark)
+    func handleCompilerOutput(output: String) {
+        var message = output
+        var summary = "Message"
+        var category: Message.Category
+        if output.contains("Error:") {
+            category = Message.Category.error
+            message = message.replacingOccurrences(of: "Error: ", with: "")
+            summary = "Error"
+        } else if output.contains("Warning:") {
+            category = Message.Category.warning
+            message = message.replacingOccurrences(of: "Warning: ", with: "")
+            summary = "Warning"
+        } else {
+            return
         }
+        
+        let lineColSearch = /(\d+):(\d+)/
+        var line = "1"
+        var col = "1"
+        if let result = try? lineColSearch.firstMatch(in: output) {
+            line = "\(result.1)"
+            col = "\(result.2)"
+            
+            let replaceLineCol = "("+line+":"+col+")"
+            message = message.replacingOccurrences(of: replaceLineCol, with: "")
+        }
+        
+        message = message.trimmingCharacters(in: NSCharacterSet.whitespacesAndNewlines)
+        
+        messages.removeAll()
+
+        messages.insert(TextLocated(location: TextLocation(oneBasedLine: Int(line) ?? 1, column: Int(col) ?? 1),
+                                    entity: Message(category: category,
+                                                    length: 1,
+                                                    summary: "\(summary )",
+                                                    description: NSAttributedString(string: message))))
     }
-    
-    static var previews: some View { Container() }
 }
 
 struct ContentView_Previews: PreviewProvider {
