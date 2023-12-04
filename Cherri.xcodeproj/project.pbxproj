@@ -15,6 +15,9 @@
 		72213BB72B1D159E00590D99 /* CherriTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72213BB62B1D159E00590D99 /* CherriTests.swift */; };
 		72213BC12B1D159E00590D99 /* CherriUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72213BC02B1D159E00590D99 /* CherriUITests.swift */; };
 		72213BC32B1D159E00590D99 /* CherriUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72213BC22B1D159E00590D99 /* CherriUITestsLaunchTests.swift */; };
+		72213BD12B1D17BE00590D99 /* CodeEditorView in Frameworks */ = {isa = PBXBuildFile; productRef = 72213BD02B1D17BE00590D99 /* CodeEditorView */; };
+		72213BD32B1D17BE00590D99 /* LanguageSupport in Frameworks */ = {isa = PBXBuildFile; productRef = 72213BD22B1D17BE00590D99 /* LanguageSupport */; };
+		72213BD52B1D24EB00590D99 /* cherri_binary in Resources */ = {isa = PBXBuildFile; fileRef = 72213BD42B1D24EB00590D99 /* cherri_binary */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -48,6 +51,7 @@
 		72213BBC2B1D159E00590D99 /* CherriUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CherriUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		72213BC02B1D159E00590D99 /* CherriUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CherriUITests.swift; sourceTree = "<group>"; };
 		72213BC22B1D159E00590D99 /* CherriUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CherriUITestsLaunchTests.swift; sourceTree = "<group>"; };
+		72213BD42B1D24EB00590D99 /* cherri_binary */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; path = cherri_binary; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -55,6 +59,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				72213BD32B1D17BE00590D99 /* LanguageSupport in Frameworks */,
+				72213BD12B1D17BE00590D99 /* CodeEditorView in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -100,6 +106,7 @@
 			children = (
 				72213BA12B1D159C00590D99 /* CherriApp.swift */,
 				72213BA32B1D159C00590D99 /* CherriDocument.swift */,
+				72213BD42B1D24EB00590D99 /* cherri_binary */,
 				72213BA52B1D159C00590D99 /* ContentView.swift */,
 				72213BA72B1D159E00590D99 /* Assets.xcassets */,
 				72213BAC2B1D159E00590D99 /* Info.plist */,
@@ -150,6 +157,10 @@
 			dependencies = (
 			);
 			name = Cherri;
+			packageProductDependencies = (
+				72213BD02B1D17BE00590D99 /* CodeEditorView */,
+				72213BD22B1D17BE00590D99 /* LanguageSupport */,
+			);
 			productName = Cherri;
 			productReference = 72213B9E2B1D159C00590D99 /* Cherri.app */;
 			productType = "com.apple.product-type.application";
@@ -222,6 +233,9 @@
 				Base,
 			);
 			mainGroup = 72213B952B1D159B00590D99;
+			packageReferences = (
+				72213BCF2B1D17BE00590D99 /* XCRemoteSwiftPackageReference "CodeEditorView" */,
+			);
 			productRefGroup = 72213B9F2B1D159C00590D99 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -240,6 +254,7 @@
 			files = (
 				72213BAB2B1D159E00590D99 /* Preview Assets.xcassets in Resources */,
 				72213BA82B1D159E00590D99 /* Assets.xcassets in Resources */,
+				72213BD52B1D24EB00590D99 /* cherri_binary in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -581,6 +596,30 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		72213BCF2B1D17BE00590D99 /* XCRemoteSwiftPackageReference "CodeEditorView" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/mchakravarty/CodeEditorView";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.12.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		72213BD02B1D17BE00590D99 /* CodeEditorView */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 72213BCF2B1D17BE00590D99 /* XCRemoteSwiftPackageReference "CodeEditorView" */;
+			productName = CodeEditorView;
+		};
+		72213BD22B1D17BE00590D99 /* LanguageSupport */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 72213BCF2B1D17BE00590D99 /* XCRemoteSwiftPackageReference "CodeEditorView" */;
+			productName = LanguageSupport;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 72213B962B1D159B00590D99 /* Project object */;
 }
