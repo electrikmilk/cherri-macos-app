@@ -128,8 +128,10 @@ struct ContentView: View {
                     }).popover(isPresented: $showPopover, content: {
                         VStack(alignment: .leading) {
                             Toggle("Show Minimap", isOn: $showMinimap)
+                                .toggleStyle(.checkbox)
                                 .padding(2)
                             Toggle("Wrap Text", isOn: $wrapText)
+                                .toggleStyle(.checkbox)
                                 .padding(2)
                         }.padding()
                     })
@@ -140,57 +142,22 @@ struct ContentView: View {
         }.frame(minWidth: 300, minHeight: 600)
     }
     
-    func shell(_ command: String) throws -> String {
-        let task = Process()
-        let pipe = Pipe()
-        
-        task.standardOutput = pipe
-        task.standardError = pipe
-        task.arguments = ["-c", command]
-        task.executableURL = URL(fileURLWithPath: "/bin/zsh") //<--updated
-        task.standardInput = nil
-
-        try task.run() //<--updated
-        
-        let data = pipe.fileHandleForReading.readDataToEndOfFile()
-        let output = String(data: data, encoding: .utf8)!
-        
-        return output
-    }
-    
     func compileFile() {
-        let task = Process()
-        task.launchPath = "/usr/local/bin/"
-        task.executableURL = URL(fileURLWithPath: "cherri")
-        task.arguments = [fileURL.relativePath, "--no-ansi","-i"]
+        let process = Process()
         
-        task.launch()
+        let bundle = Bundle.main
+        process.executableURL = bundle.url(forResource: "cherri_binary", withExtension: "")
+        process.arguments = [fileURL.relativePath, "--no-ansi", "-i"]
         
         let pipe = Pipe()
-        task.standardInput = nil
-        task.standardOutput = pipe
-        task.standardError = pipe
-
+        process.standardInput = nil
+        process.standardOutput = pipe
+        process.standardError = pipe
+        
+        process.launch()
+        
         let data = pipe.fileHandleForReading.readDataToEndOfFile()
         let output = String(data: data, encoding: .utf8)!
-        
-//        var output = try? shell("cherri --no-ansi "+fileURL.relativePath)
-//        let process = Process()
-//        
-//        let bundle = Bundle.main
-//        process.launchPath = "/usr/local/bin/cherri"
-////        process.executableURL = bundle.url(forResource: "cherri_binary", withExtension: "")
-//        process.arguments = [fileURL.relativePath, "--no-ansi"]
-//        
-//        let pipe = Pipe()
-//        process.standardInput = nil
-//        process.standardOutput = pipe
-//        process.standardError = pipe
-//        
-//        process.launch()
-//        
-//        let data = pipe.fileHandleForReading.readDataToEndOfFile()
-//        let output = String(data: data, encoding: .utf8)!
         
         print(output)
     }
