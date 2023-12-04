@@ -122,7 +122,6 @@ struct ContentView: View {
                     Button("Add Message") { showMessageEntry = true }
                         .sheet(isPresented: $showMessageEntry){ MessageEntry(messages: $messages) }
                     Link("Documentation", destination: URL(string: "https://cherrilang.org/language/")!)
-                        .foregroundColor(.accentColor)
                     Button("Config", systemImage: "gear", action: {
                         self.showPopover = true
                     }).popover(isPresented: $showPopover, content: {
