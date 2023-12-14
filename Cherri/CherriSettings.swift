@@ -8,6 +8,9 @@
 import SwiftUI
 
 struct CherriSettings: View {
+    @AppStorage("Cherri.theme")
+    private var theme: ContentView.CodeTheme = .dark
+    
     @AppStorage("Cherri.shareWith")
     private var shareWith: ContentView.ShareOption = .contacts
     
@@ -19,12 +22,18 @@ struct CherriSettings: View {
     
     var body: some View {
         Form {
-            Picker("Share Shortcuts with:", selection: $shareWith) {
+            Picker("Editor Theme:", selection: $theme) {
+                ForEach(ContentView.CodeTheme.allCases) { level in
+                    Text(level.rawValue)
+                }
+            }
+            .pickerStyle(.menu)
+            Picker("Share compiled Shortcuts with:", selection: $shareWith) {
                 ForEach(ContentView.ShareOption.allCases) { level in
                     Text(level.rawValue)
                 }
             }
-            .pickerStyle(.inline)
+            .pickerStyle(.menu)
             Toggle("Show Minimap", isOn: $showMinimap)
                 .toggleStyle(.checkbox)
                 .padding(2)

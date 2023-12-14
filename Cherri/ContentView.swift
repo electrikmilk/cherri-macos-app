@@ -23,6 +23,18 @@ struct MessageEntry {
 }
 
 struct ContentView: View {
+    @AppStorage("Cherri.theme")
+    private var theme: CodeTheme = .dark
+    
+    enum CodeTheme: String, CaseIterable, Identifiable {
+        case light = "Light"
+        case dark = "Dark"
+        
+        var id: CodeTheme {
+            return self
+        }
+    }
+    
     @AppStorage("Cherri.shareWith")
     private var shareWith: ShareOption = .contacts
     
@@ -77,7 +89,7 @@ struct ContentView: View {
                            messages: $messages,
                            language: .swift(),
                            layout: CodeEditor.LayoutConfiguration(showMinimap: showMinimap, wrapText: wrapText))
-                .environment(\.codeEditorTheme, Theme.defaultDark)
+                .environment(\.codeEditorTheme, theme == .dark ? Theme.defaultDark : Theme.defaultLight)
                 .focused($editorIsFocused)
             }.toolbar {
                 HStack {
