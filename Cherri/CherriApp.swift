@@ -11,7 +11,11 @@ import SwiftUI
 struct CherriApp: App {
     var body: some Scene {
         DocumentGroup(newDocument: CherriDocument()) { file in
-            ContentView(document: file.$document, fileURL: file.fileURL!)
+            ContentView(document: file.$document, fileURL: file.fileURL ?? URL(fileURLWithPath: ""))
+        }
+        
+        Settings {
+            CherriSettings()
         }
     }
 }

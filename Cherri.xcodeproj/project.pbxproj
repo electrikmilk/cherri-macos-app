@@ -18,6 +18,7 @@
 		72213BD12B1D17BE00590D99 /* CodeEditorView in Frameworks */ = {isa = PBXBuildFile; productRef = 72213BD02B1D17BE00590D99 /* CodeEditorView */; };
 		72213BD32B1D17BE00590D99 /* LanguageSupport in Frameworks */ = {isa = PBXBuildFile; productRef = 72213BD22B1D17BE00590D99 /* LanguageSupport */; };
 		72213BD52B1D24EB00590D99 /* cherri_binary in Resources */ = {isa = PBXBuildFile; fileRef = 72213BD42B1D24EB00590D99 /* cherri_binary */; };
+		72F863B82B2A870C00A98DE6 /* CherriSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72F863B72B2A870C00A98DE6 /* CherriSettings.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -52,6 +53,7 @@
 		72213BC02B1D159E00590D99 /* CherriUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CherriUITests.swift; sourceTree = "<group>"; };
 		72213BC22B1D159E00590D99 /* CherriUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CherriUITestsLaunchTests.swift; sourceTree = "<group>"; };
 		72213BD42B1D24EB00590D99 /* cherri_binary */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; path = cherri_binary; sourceTree = "<group>"; };
+		72F863B72B2A870C00A98DE6 /* CherriSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CherriSettings.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -112,6 +114,7 @@
 				72213BAC2B1D159E00590D99 /* Info.plist */,
 				72213BAD2B1D159E00590D99 /* Cherri.entitlements */,
 				72213BA92B1D159E00590D99 /* Preview Content */,
+				72F863B72B2A870C00A98DE6 /* CherriSettings.swift */,
 			);
 			path = Cherri;
 			sourceTree = "<group>";
@@ -280,6 +283,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				72213BA22B1D159C00590D99 /* CherriApp.swift in Sources */,
+				72F863B82B2A870C00A98DE6 /* CherriSettings.swift in Sources */,
 				72213BA42B1D159C00590D99 /* CherriDocument.swift in Sources */,
 				72213BA62B1D159C00590D99 /* ContentView.swift in Sources */,
 			);

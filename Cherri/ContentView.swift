@@ -23,6 +23,18 @@ struct MessageEntry {
 }
 
 struct ContentView: View {
+    @AppStorage("Cherri.shareWith")
+    private var shareWith: ShareOption = .contacts
+    
+    enum ShareOption: String, CaseIterable, Identifiable {
+        case contacts = "Contacts"
+        case anyone = "Anyone"
+        
+        var id: ShareOption {
+            return self
+        }
+    }
+    
     @Binding var document: CherriDocument
     @State var fileURL: URL
     
@@ -31,16 +43,35 @@ struct ContentView: View {
     @SceneStorage("editPosition") private var editPosition: CodeEditor.Position = CodeEditor.Position()
     
     @State private var messages:         Set<TextLocated<Message>> = Set ()
-    @State private var showMessageEntry: Bool                      = false
-    @State private var showMinimap:      Bool                      = true
+    
     @State private var showPopover:      Bool                      = false
-    @State private var wrapText:         Bool                      = true
+    
+    @AppStorage("Cherri.showMinimap")
+    private var showMinimap:             Bool                      = true
+    
+    @AppStorage("Cherri.wrapText")
+    private var wrapText:                Bool                      = true
+    
+    @State private var hasError:         Bool                      = false
+    @State private var hasWarnings:      Bool                      = false
+    @State private var compiling:        Bool                      = false
+    @State private var compiled:         Bool                      = false
     
     @FocusState private var editorIsFocused: Bool
     
     var body: some View {
         VStack {
             NavigationStack {
+                if hasError {
+                    HStack {
+                        Image(systemName: "exclamationmark.triangle.fill")
+                            .foregroundColor(.red)
+                        Text("Unable to compile Shortcut.")
+                    }
+                    .fontWeight(.bold)
+                    .padding(EdgeInsets(top: 12, leading: 8, bottom: 7, trailing: 8))
+                }
+                
                 CodeEditor(text: $document.text,
                            position: $editPosition,
                            messages: $messages,
@@ -51,31 +82,56 @@ struct ContentView: View {
             }.toolbar {
                 HStack {
                     Link("Documentation", destination: URL(string: "https://cherrilang.org/language/")!)
-                    Button("Config", systemImage: "gear", action: {
-                        self.showPopover = true
-                    }).popover(isPresented: $showPopover, content: {
-                        VStack(alignment: .leading) {
-                            Toggle("Show Minimap", isOn: $showMinimap)
-                                .toggleStyle(.checkbox)
-                                .padding(2)
-                            Toggle("Wrap Text", isOn: $wrapText)
-                                .toggleStyle(.checkbox)
-                                .padding(2)
-                        }.padding()
-                    })
-                    Button("Build", systemImage: "hammer", action: compileFile)
+                    if !compiling {
+                        Button("Build", systemImage: "hammer.fill") {
+                            Task {
+                                compileFile(openCompiled: false)
+                            }
+                        }
                         .buttonStyle(.automatic)
+                        Button("Run", systemImage: "play.fill") {
+                            Task {
+                                compileFile(openCompiled: true)
+                            }
+                        }
+                        .buttonStyle(.automatic)
+                        if hasError {
+                            Image(systemName: "checkmark.circle.badge.xmark.fill")
+                                .foregroundColor(.red)
+                        } else if hasWarnings {
+                            Image(systemName: "checkmark.circle.trianglebadge.exclamationmark")
+                        } else if compiled {
+                            Image(systemName: "checkmark.circle.fill")
+                                .foregroundColor(.green)
+                        }
+                    } else {
+                        ProgressView()
+                            .progressViewStyle(CircularProgressViewStyle())
+                    }
                 }
             }
         }.frame(minWidth: 300, minHeight: 600)
     }
     
-    func compileFile() {
+    func compileFile(openCompiled: Bool) {
+        compiled = false
+        hasError = false
+        hasWarnings = false
+        compiling = true
+        messages.removeAll()
+        
         let process = Process()
         
         let bundle = Bundle.main
         process.executableURL = bundle.url(forResource: "cherri_binary", withExtension: "")
-        process.arguments = [fileURL.relativePath, "--no-ansi", "-i"]
+        process.arguments = [fileURL.relativePath, "--no-ansi"]
+        
+        if openCompiled {
+            process.arguments?.append("-i")
+        }
+        if shareWith == .contacts {
+            process.arguments?.append("--share=contacts")
+        }
         
         let pipe = Pipe()
         process.standardInput = nil
@@ -87,45 +143,54 @@ struct ContentView: View {
         let data = pipe.fileHandleForReading.readDataToEndOfFile()
         let output = String(data: data, encoding: .utf8)!
         
-        handleCompilerOutput(output: output)
-    }
-    
-    func handleCompilerOutput(output: String) {
-        var message = output
-        var summary = "Message"
-        var category: Message.Category
-        if output.contains("Error:") {
-            category = Message.Category.error
-            message = message.replacingOccurrences(of: "Error: ", with: "")
-            summary = "Error"
-        } else if output.contains("Warning:") {
-            category = Message.Category.warning
-            message = message.replacingOccurrences(of: "Warning: ", with: "")
-            summary = "Warning"
-        } else {
-            return
-        }
+        handleCompilerOutput(output: "\(output)\n\n")
         
+        compiling = false
+    }
+
+    func handleCompilerOutput(output: String) {
+        if output.contains("Warning:") {
+            let matches = output.matches(of: /Warning: (?<message>(.|\n)*?)\n\n/)
+            if matches.count != 0 {
+                hasWarnings = true
+            }
+            for match in matches {
+                createMessage(message: String(match.message), summary: "Warning", category: Message.Category.warning)
+            }
+        }
+        if output.contains("Error:") || output.contains("panic:") {
+            hasError = true
+            
+            let errorSearch = /Error: (?<message>(.|\n)*?)\n\n/
+            if let error = try? errorSearch.firstMatch(in: output) {
+                createMessage(message: String(error.1), summary: "Error", category: Message.Category.error)
+            }
+        }
+        if !hasError {
+            compiled = true
+        }
+    }
+
+    func createMessage(message: String, summary: String, category: Message.Category) {
         let lineColSearch = /(\d+):(\d+)/
+        var messageContent = message
         var line = "1"
         var col = "1"
-        if let result = try? lineColSearch.firstMatch(in: output) {
+        if let result = try? lineColSearch.firstMatch(in: messageContent) {
             line = "\(result.1)"
             col = "\(result.2)"
             
-            let replaceLineCol = "("+line+":"+col+")"
-            message = message.replacingOccurrences(of: replaceLineCol, with: "")
+            let replaceLineCol = " ("+line+":"+col+")"
+            messageContent = messageContent.replacingOccurrences(of: replaceLineCol, with: "")
         }
         
-        message = message.trimmingCharacters(in: NSCharacterSet.whitespacesAndNewlines)
+        messageContent = messageContent.trimmingCharacters(in: NSCharacterSet.whitespacesAndNewlines)
         
-        messages.removeAll()
-
         messages.insert(TextLocated(location: TextLocation(oneBasedLine: Int(line) ?? 1, column: Int(col) ?? 1),
                                     entity: Message(category: category,
                                                     length: 1,
-                                                    summary: "\(summary )",
-                                                    description: NSAttributedString(string: message))))
+                                                    summary: summary,
+                                                    description: NSAttributedString(string: messageContent))))
     }
 }
 
