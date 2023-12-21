@@ -81,7 +81,7 @@ struct ContentView: View {
                         Text("Unable to compile Shortcut.")
                     }
                     .fontWeight(.bold)
-                    .padding(EdgeInsets(top: 12, leading: 8, bottom: 7, trailing: 8))
+                    .padding(EdgeInsets(top: 12, leading: 0, bottom: 5, trailing: 0))
                 }
                 
                 CodeEditor(text: $document.text,
