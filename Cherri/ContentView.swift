@@ -138,6 +138,12 @@ struct ContentView: View {
         process.executableURL = bundle.url(forResource: "cherri_binary", withExtension: "")
         process.arguments = [fileURL.relativePath, "--no-ansi"]
         
+        let pathParts = fileURL.relativePath
+            .replacingOccurrences(of: "file://", with: "")
+            .split(separator: "/")
+        let path = fileURL.relativePath.replacingOccurrences(of: pathParts.last!, with: "")
+        process.currentDirectoryURL = URL(fileURLWithPath: path)
+        
         if openCompiled {
             process.arguments?.append("-i")
         }
