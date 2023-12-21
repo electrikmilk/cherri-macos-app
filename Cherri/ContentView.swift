@@ -108,7 +108,7 @@ struct ContentView: View {
                         }
                         .buttonStyle(.automatic)
                         if hasError {
-                            Image(systemName: "checkmark.circle.badge.xmark.fill")
+                            Image(systemName: "x.circle.fill")
                                 .foregroundColor(.red)
                         } else if hasWarnings {
                             Image(systemName: "checkmark.circle.trianglebadge.exclamationmark")
