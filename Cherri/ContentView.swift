@@ -118,6 +118,10 @@ struct ContentView: View {
                             }
                         }.buttonStyle(.automatic)
                         
+                        if hasError || compiled {
+                            Spacer().frame(width: 20)
+                        }
+                        
                         if hasError {
                             Image(systemName: "x.circle.fill")
                                 .foregroundColor(.red)
