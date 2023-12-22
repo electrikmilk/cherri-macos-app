@@ -49,6 +49,11 @@ struct ContentView: View {
     
     @Binding var document: CherriDocument
     @State var fileURL: URL
+    @State var shortcutURL: URL?
+    
+    @State var fileName: String = ""
+    @State var shortcutName: String = ""
+    @State var path: String = ""
     
     @Environment(\.colorScheme) private var colorScheme: ColorScheme
     
@@ -125,11 +130,32 @@ struct ContentView: View {
         }.frame(minWidth: 300, minHeight: 600)
     }
     
+    func parseFilepath() {
+        let pathParts = fileURL.relativePath
+            .replacingOccurrences(of: "file://", with: "")
+            .split(separator: "/")
+
+        fileName = "\(pathParts.last!)"
+        path = fileURL.relativePath.replacingOccurrences(of: "/\(pathParts.last!)", with: "")
+
+        shortcutName = fileName.replacingOccurrences(of: ".cherri", with: ".shortcut")
+
+        let nameDefinitionSearch = /^#define name (.*?)\n/
+        if let result = try? nameDefinitionSearch.firstMatch(in: "\(document.text)") {
+            shortcutName = "\(result.1.replacingOccurrences(of: "%20", with: "")).shortcut"
+        }
+
+        shortcutURL = URL(string: "\(path)/\(shortcutName.replacingOccurrences(of: "%20", with: ""))")!
+    }
+    
     func compileFile(openCompiled: Bool) {
         compiled = false
         hasError = false
         hasWarnings = false
         compiling = true
+        
+        parseFilepath()
+        
         messages.removeAll()
         
         let process = Process()
@@ -137,11 +163,6 @@ struct ContentView: View {
         let bundle = Bundle.main
         process.executableURL = bundle.url(forResource: "cherri_binary", withExtension: "")
         process.arguments = [fileURL.relativePath, "--no-ansi"]
-        
-        let pathParts = fileURL.relativePath
-            .replacingOccurrences(of: "file://", with: "")
-            .split(separator: "/")
-        let path = fileURL.relativePath.replacingOccurrences(of: pathParts.last!, with: "")
         process.currentDirectoryURL = URL(fileURLWithPath: path)
         
         if openCompiled {
