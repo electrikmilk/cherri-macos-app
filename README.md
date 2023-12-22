@@ -4,7 +4,7 @@
 
 IDE for the [Cherri programming language](https://github.com/electrikmilk/cherri).
 
-![Screenshot 2023-12-20 at 20 02 08](https://github.com/electrikmilk/cherri-macos-app/assets/4368524/579a31b5-f9b7-4595-9daf-364854150979)
+![Screenshot 2023-12-21 at 23 44 29](https://github.com/electrikmilk/cherri-macos-app/assets/4368524/99b290c0-4299-44ad-86a1-7158b319022a)
 
 ## Features
 
@@ -18,8 +18,8 @@ Create, edit, save, open, duplicate, rename, etc. Cherri files.
 
 ### Inline Errors & Warnings
 
-![Screenshot 2023-12-20 at 21 03 52](https://github.com/electrikmilk/cherri-macos-app/assets/4368524/046bcee3-00a5-45ac-973a-3cfc9bc22342)
-![Screenshot 2023-12-20 at 21 04 56](https://github.com/electrikmilk/cherri-macos-app/assets/4368524/b8b27eae-8490-47f9-b743-54a7f5c54b62)
+![Screenshot 2023-12-21 at 23 45 09](https://github.com/electrikmilk/cherri-macos-app/assets/4368524/03a85422-5576-4a24-b93c-351d1431f2f0)
+![Screenshot 2023-12-21 at 23 44 58](https://github.com/electrikmilk/cherri-macos-app/assets/4368524/356fafd5-a2a0-461d-a849-6af4e6fbbc2c)
 
 ### Tabs
 
@@ -27,7 +27,7 @@ Enable the tab bar in the Menubar in **View -> Show Tab Bar**. Click the plus bu
 
 If you open a file and it does not open in a new tab, go to your **System Settings** -> **Desktop & Dock** -> Set **Prefer tabs when opening documents** to _Always_.
 
-![Screenshot 2023-12-20 at 20 29 13](https://github.com/electrikmilk/cherri-macos-app/assets/4368524/802ed5d0-a0ff-400e-82d9-63f83dc10c1f)
+![Screenshot 2023-12-21 at 23 46 21](https://github.com/electrikmilk/cherri-macos-app/assets/4368524/0ebf3d24-1f59-4886-98c8-85d334663da9)
 
 ### Document Type
 
