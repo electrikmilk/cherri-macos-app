@@ -98,7 +98,6 @@ struct ContentView: View {
                 .focused($editorIsFocused)
             }.toolbar {
                 HStack {
-                    Link("Documentation", destination: URL(string: "https://cherrilang.org/language/")!)
                     if compiling {
                         ProgressView()
                             .progressViewStyle(CircularProgressViewStyle())
