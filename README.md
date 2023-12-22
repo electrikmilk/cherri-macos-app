@@ -4,7 +4,7 @@
 
 IDE for the [Cherri programming language](https://github.com/electrikmilk/cherri).
 
-![Screenshot 2023-12-20 at 20 02 08](https://github.com/electrikmilk/cherri-macos-app/assets/4368524/579a31b5-f9b7-4595-9daf-364854150979)
+![Screenshot 2023-12-21 at 22 49 07](https://github.com/electrikmilk/cherri-macos-app/assets/4368524/bb503523-5624-4f7c-9820-d91d12df27da)
 
 ## Features
 
@@ -19,7 +19,7 @@ Create, edit, save, open, duplicate, rename, etc. Cherri files.
 ### Inline Errors & Warnings
 
 ![Screenshot 2023-12-20 at 21 03 52](https://github.com/electrikmilk/cherri-macos-app/assets/4368524/046bcee3-00a5-45ac-973a-3cfc9bc22342)
-![Screenshot 2023-12-20 at 21 04 56](https://github.com/electrikmilk/cherri-macos-app/assets/4368524/b8b27eae-8490-47f9-b743-54a7f5c54b62)
+![Screenshot 2023-12-21 at 22 49 38](https://github.com/electrikmilk/cherri-macos-app/assets/4368524/f6b54584-6f35-4e0a-85eb-43fda629e9bd)
 
 ### Tabs
 
