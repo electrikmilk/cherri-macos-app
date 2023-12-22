@@ -116,15 +116,17 @@ struct ContentView: View {
                         if hasError {
                             Image(systemName: "x.circle.fill")
                                 .foregroundColor(.red)
-                        } else if hasWarnings {
-                            Image(systemName: "checkmark.circle.trianglebadge.exclamationmark")
                         } else if compiled {
-                            Image(systemName: "checkmark.circle.fill")
-                                .foregroundColor(.green)
+                            Button("Compiled", systemImage: "checkmark.circle.fill") {
+                                NSWorkspace.shared
+                                    .selectFile( "\(shortcutURL!)".replacingOccurrences(of: "%20", with: " "), inFileViewerRootedAtPath: "")
+                            }.foregroundColor(.green)
                         }
-                    } else {
-                        ProgressView()
-                            .progressViewStyle(CircularProgressViewStyle())
+                        
+                        if hasWarnings {
+                            Image(systemName: "exclamationmark.triangle.fill")
+                                .foregroundColor(.orange)
+                        }
                     }
                 }
             }
