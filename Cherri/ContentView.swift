@@ -106,12 +106,13 @@ struct ContentView: View {
                             }
                         }
                         .buttonStyle(.automatic)
+                        
                         Button("Run", systemImage: "play.fill") {
                             Task {
                                 compileFile(openCompiled: true)
                             }
-                        }
-                        .buttonStyle(.automatic)
+                        }.buttonStyle(.automatic)
+                        
                         if hasError {
                             Image(systemName: "x.circle.fill")
                                 .foregroundColor(.red)
