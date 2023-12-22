@@ -99,7 +99,12 @@ struct ContentView: View {
             }.toolbar {
                 HStack {
                     Link("Documentation", destination: URL(string: "https://cherrilang.org/language/")!)
-                    if !compiling {
+                    if compiling {
+                        ProgressView()
+                            .progressViewStyle(CircularProgressViewStyle())
+                            .scaleEffect(x: 0.5, y: 0.5, anchor: .center)
+                            .padding(EdgeInsets(top: 5, leading: 5, bottom: 5, trailing: 0))
+                    } else {
                         Button("Build", systemImage: "hammer.fill") {
                             Task {
                                 compileFile(openCompiled: false)
