@@ -14,7 +14,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
     func showAboutPanel() {
         if aboutBoxWindowController == nil {
-            let styleMask: NSWindow.StyleMask = [.closable]
+            let styleMask: NSWindow.StyleMask = [.closable, .titled]
             let window = NSWindow()
             window.styleMask = styleMask
             window.contentView = NSHostingView(rootView: AboutView())
