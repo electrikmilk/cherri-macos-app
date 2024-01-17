@@ -18,6 +18,8 @@
 		72213BD12B1D17BE00590D99 /* CodeEditorView in Frameworks */ = {isa = PBXBuildFile; productRef = 72213BD02B1D17BE00590D99 /* CodeEditorView */; };
 		72213BD32B1D17BE00590D99 /* LanguageSupport in Frameworks */ = {isa = PBXBuildFile; productRef = 72213BD22B1D17BE00590D99 /* LanguageSupport */; };
 		72213BD52B1D24EB00590D99 /* cherri_binary in Resources */ = {isa = PBXBuildFile; fileRef = 72213BD42B1D24EB00590D99 /* cherri_binary */; };
+		72D4674F2B578C9A00547002 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72D4674E2B578C9A00547002 /* AppDelegate.swift */; };
+		72D467512B578CB300547002 /* AboutView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72D467502B578CB300547002 /* AboutView.swift */; };
 		72F863B82B2A870C00A98DE6 /* CherriSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72F863B72B2A870C00A98DE6 /* CherriSettings.swift */; };
 /* End PBXBuildFile section */
 
@@ -53,6 +55,8 @@
 		72213BC02B1D159E00590D99 /* CherriUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CherriUITests.swift; sourceTree = "<group>"; };
 		72213BC22B1D159E00590D99 /* CherriUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CherriUITestsLaunchTests.swift; sourceTree = "<group>"; };
 		72213BD42B1D24EB00590D99 /* cherri_binary */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; path = cherri_binary; sourceTree = "<group>"; };
+		72D4674E2B578C9A00547002 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		72D467502B578CB300547002 /* AboutView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AboutView.swift; sourceTree = "<group>"; };
 		72F863B72B2A870C00A98DE6 /* CherriSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CherriSettings.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -107,6 +111,8 @@
 			isa = PBXGroup;
 			children = (
 				72213BA12B1D159C00590D99 /* CherriApp.swift */,
+				72D4674E2B578C9A00547002 /* AppDelegate.swift */,
+				72D467502B578CB300547002 /* AboutView.swift */,
 				72213BA32B1D159C00590D99 /* CherriDocument.swift */,
 				72213BD42B1D24EB00590D99 /* cherri_binary */,
 				72213BA52B1D159C00590D99 /* ContentView.swift */,
@@ -285,6 +291,8 @@
 				72213BA22B1D159C00590D99 /* CherriApp.swift in Sources */,
 				72F863B82B2A870C00A98DE6 /* CherriSettings.swift in Sources */,
 				72213BA42B1D159C00590D99 /* CherriDocument.swift in Sources */,
+				72D4674F2B578C9A00547002 /* AppDelegate.swift in Sources */,
+				72D467512B578CB300547002 /* AboutView.swift in Sources */,
 				72213BA62B1D159C00590D99 /* ContentView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
