@@ -46,3 +46,17 @@ If you have previews on, it shows the contents of the file.
 ## Dependencies
 
 - [CodeEditorView](https://github.com/mchakravarty/CodeEditorView)
+
+## How to run
+
+### Requirements
+
+- XCode - Download from the Mac App Store.
+- Go - Install from Homebrew or [go.dev](https://go.dev/dl/).
+
+### Run
+
+1. Open `Cherri/Cherri.xcodeproj` in XCode.
+2. Click the play icon button to build the project after it has been indexed.
+
+This should "install" the project on your Mac, at least temporarily. But if it disappears due to being an unsigned app, just follow the steps above to re-install.
