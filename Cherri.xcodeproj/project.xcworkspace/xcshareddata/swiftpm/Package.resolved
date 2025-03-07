@@ -1,4 +1,5 @@
 {
+  "originHash" : "3675a8b363ad866505239c8e2c7f6a0862ed02618f2dca478b2519372fb79c0c",
   "pins" : [
     {
       "identity" : "codeeditorview",
@@ -19,5 +20,5 @@
       }
     }
   ],
-  "version" : 2
+  "version" : 3
 }
