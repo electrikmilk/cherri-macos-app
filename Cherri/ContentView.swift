@@ -179,8 +179,8 @@ struct ContentView: View {
         if openCompiled {
             process.arguments?.append("-i")
         }
-        if shareWith == .contacts {
-            process.arguments?.append("--share=contacts")
+        if shareWith == .anyone {
+            process.arguments?.append("--share=anyone")
         }
         
         let pipe = Pipe()
