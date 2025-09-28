@@ -57,7 +57,6 @@
 		72213BC22B1D159E00590D99 /* CherriUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CherriUITestsLaunchTests.swift; sourceTree = "<group>"; };
 		72213BD42B1D24EB00590D99 /* cherri_binary */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; path = cherri_binary; sourceTree = "<group>"; };
 		724298CB2E89844900BF5234 /* CherriAppIcon.icon */ = {isa = PBXFileReference; lastKnownFileType = folder.iconcomposer.icon; path = CherriAppIcon.icon; sourceTree = "<group>"; };
-		728358422D5EA538007F02AD /* Compiler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Compiler.swift; sourceTree = "<group>"; };
 		72D4674E2B578C9A00547002 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		72D467502B578CB300547002 /* AboutView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AboutView.swift; sourceTree = "<group>"; };
 		72F863B72B2A870C00A98DE6 /* CherriSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CherriSettings.swift; sourceTree = "<group>"; };
