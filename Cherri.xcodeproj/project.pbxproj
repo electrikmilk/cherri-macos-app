@@ -17,6 +17,7 @@
 		72213BC32B1D159E00590D99 /* CherriUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72213BC22B1D159E00590D99 /* CherriUITestsLaunchTests.swift */; };
 		72213BD12B1D17BE00590D99 /* CodeEditorView in Frameworks */ = {isa = PBXBuildFile; productRef = 72213BD02B1D17BE00590D99 /* CodeEditorView */; };
 		72213BD32B1D17BE00590D99 /* LanguageSupport in Frameworks */ = {isa = PBXBuildFile; productRef = 72213BD22B1D17BE00590D99 /* LanguageSupport */; };
+		724298CC2E89844900BF5234 /* CherriAppIcon.icon in Resources */ = {isa = PBXBuildFile; fileRef = 724298CB2E89844900BF5234 /* CherriAppIcon.icon */; };
 		728358452D5EB38A007F02AD /* cherri_binary in Resources */ = {isa = PBXBuildFile; fileRef = 72213BD42B1D24EB00590D99 /* cherri_binary */; };
 		72D4674F2B578C9A00547002 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72D4674E2B578C9A00547002 /* AppDelegate.swift */; };
 		72D467512B578CB300547002 /* AboutView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72D467502B578CB300547002 /* AboutView.swift */; };
@@ -55,6 +56,8 @@
 		72213BC02B1D159E00590D99 /* CherriUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CherriUITests.swift; sourceTree = "<group>"; };
 		72213BC22B1D159E00590D99 /* CherriUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CherriUITestsLaunchTests.swift; sourceTree = "<group>"; };
 		72213BD42B1D24EB00590D99 /* cherri_binary */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; path = cherri_binary; sourceTree = "<group>"; };
+		724298CB2E89844900BF5234 /* CherriAppIcon.icon */ = {isa = PBXFileReference; lastKnownFileType = folder.iconcomposer.icon; path = CherriAppIcon.icon; sourceTree = "<group>"; };
+		728358422D5EA538007F02AD /* Compiler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Compiler.swift; sourceTree = "<group>"; };
 		72D4674E2B578C9A00547002 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		72D467502B578CB300547002 /* AboutView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AboutView.swift; sourceTree = "<group>"; };
 		72F863B72B2A870C00A98DE6 /* CherriSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CherriSettings.swift; sourceTree = "<group>"; };
@@ -121,6 +124,7 @@
 				72213BAD2B1D159E00590D99 /* Cherri.entitlements */,
 				72213BA92B1D159E00590D99 /* Preview Content */,
 				72F863B72B2A870C00A98DE6 /* CherriSettings.swift */,
+				724298CB2E89844900BF5234 /* CherriAppIcon.icon */,
 			);
 			path = Cherri;
 			sourceTree = "<group>";
@@ -262,6 +266,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				724298CC2E89844900BF5234 /* CherriAppIcon.icon in Resources */,
 				728358452D5EB38A007F02AD /* cherri_binary in Resources */,
 				72213BAB2B1D159E00590D99 /* Preview Assets.xcassets in Resources */,
 				72213BA82B1D159E00590D99 /* Assets.xcassets in Resources */,
@@ -294,7 +299,7 @@
 			inputFileListPaths = (
 			);
 			inputPaths = (
-				"$(SRCROOT)/Compiler/",
+				"$(SRCROOT)/Compiler",
 			);
 			outputFileListPaths = (
 			);
@@ -478,8 +483,9 @@
 		72213BC72B1D159E00590D99 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_APPICON_NAME = CherriAppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CODE_SIGN_ENTITLEMENTS = Cherri/Cherri.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
@@ -491,7 +497,7 @@
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Cherri/Info.plist;
-				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.developer-tools";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -508,8 +514,9 @@
 		72213BC82B1D159E00590D99 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_APPICON_NAME = CherriAppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CODE_SIGN_ENTITLEMENTS = Cherri/Cherri.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
@@ -521,7 +528,7 @@
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Cherri/Info.plist;
-				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.developer-tools";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
