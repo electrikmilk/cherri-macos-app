@@ -6,7 +6,7 @@
 	<array>
 		<dict>
 			<key>CFBundleTypeIconFile</key>
-			<string></string>
+			<string>Icon</string>
 			<key>CFBundleTypeIconSystemGenerated</key>
 			<integer>1</integer>
 			<key>CFBundleTypeName</key>

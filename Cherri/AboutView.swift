@@ -11,7 +11,7 @@ import SwiftUI
 struct AboutView: View {
     var body: some View {
         VStack(spacing: 8) {
-            Image(nsImage: NSImage(named: "AppIcon")!)
+            Image(nsImage: NSImage(named: "Icon")!)
                 .scaleEffect(x: 0.5, y: 0.5, anchor: .center)
                 .frame(maxWidth: 64, maxHeight: 64)
             
