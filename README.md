@@ -1,10 +1,10 @@
-![256](https://github.com/electrikmilk/cherri-macos-app/assets/4368524/6b7c2b24-f471-4c28-8484-7a17ac4886e8)
+<img width="256" height="256" alt="Icon-macOS-Default-1024x1024@1x" src="https://github.com/user-attachments/assets/b6418533-9f27-49a4-8283-93c98a5c8cac" />
 
 # Cherri IDE
 
 IDE for the [Cherri programming language](https://github.com/electrikmilk/cherri).
 
-![Screenshot 2023-12-21 at 23 44 29](https://github.com/electrikmilk/cherri-macos-app/assets/4368524/99b290c0-4299-44ad-86a1-7158b319022a)
+<img width="1012" height="800" alt="Screenshot 2025-10-03 at 20 09 31" src="https://github.com/user-attachments/assets/5c1de8c3-f28c-4295-94e7-6d1c86f994d6" />
 
 ## Features
 
