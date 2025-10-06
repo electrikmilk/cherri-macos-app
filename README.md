@@ -4,18 +4,6 @@
 
 IDE for the [Cherri programming language](https://github.com/electrikmilk/cherri).
 
-**Add Tap:**
-
-```console
-brew tap electrikmilk/cherri
-```
-
-**Install:**
-
-```console
-brew install electrikmilk/cherri/cherri-app
-```
-
 <img width="1012" height="800" alt="Screenshot 2025-10-03 at 20 09 31" src="https://github.com/user-attachments/assets/5c1de8c3-f28c-4295-94e7-6d1c86f994d6" />
 
 ## Features
