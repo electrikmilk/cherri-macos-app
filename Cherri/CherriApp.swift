@@ -29,11 +29,11 @@ struct CherriApp: App {
                 .onAppear {}
         }.commands {
             CommandMenu("Build") {
-                Button("Build") {
+                Button("Build", systemImage: "hammer.fill") {
                     editorController.build()
                 }
                 .keyboardShortcut("b", modifiers: [.command])
-                Button("Build & Open in Shortcuts") {
+                Button("Build & Open in Shortcuts", systemImage: "play.fill") {
                     editorController.buildAndOpen()
                 }
                 .keyboardShortcut("r", modifiers: [.command])
