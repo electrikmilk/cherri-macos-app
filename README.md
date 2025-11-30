@@ -49,6 +49,10 @@ If you have previews on, it shows the contents of the file.
 
 ## How to run
 
+```bash
+git clone --recursive
+```
+
 ### Requirements
 
 - XCode - Download from the Mac App Store.
