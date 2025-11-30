@@ -34,7 +34,7 @@ struct CherriApp: App {
                 }
                 .keyboardShortcut("b", modifiers: [.command])
                 .disabled((editorController.currentContentView == nil))
-                Button("Build & Open in Shortcuts", systemImage: "play.fill") {
+                Button("Build & Open", systemImage: "play.fill") {
                     editorController.buildAndOpen()
                 }
                 .keyboardShortcut("r", modifiers: [.command])
