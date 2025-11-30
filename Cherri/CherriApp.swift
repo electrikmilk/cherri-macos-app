@@ -33,10 +33,12 @@ struct CherriApp: App {
                     editorController.build()
                 }
                 .keyboardShortcut("b", modifiers: [.command])
+                .disabled((editorController.currentContentView == nil))
                 Button("Build & Open in Shortcuts", systemImage: "play.fill") {
                     editorController.buildAndOpen()
                 }
                 .keyboardShortcut("r", modifiers: [.command])
+                .disabled((editorController.currentContentView == nil))
             }
             CommandGroup(replacing: .help) {
                 Link("Documentation Site", destination: URL(string: "https://cherrilang.org/language/")!)
