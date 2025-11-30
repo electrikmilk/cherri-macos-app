@@ -33,7 +33,7 @@ If you open a file and it does not open in a new tab, go to your **System Settin
 
 This app sets up `.cherri` files as a type of plain text document.
 
-![Screenshot 2023-12-20 at 20 25 41](https://github.com/electrikmilk/cherri-macos-app/assets/4368524/33f17ae2-7746-4782-b5f1-53f35b65a895)
+<img width="103" height="104" alt="Screenshot 2025-11-29 at 21 48 19" src="https://github.com/user-attachments/assets/e30d2438-d166-4618-aba1-999de29afde5" />
 
 If you have previews on, it shows the contents of the file.
 
