@@ -50,7 +50,7 @@ If you have previews on, it shows the contents of the file.
 ## How to run
 
 ```bash
-git clone --recursive
+git clone --recursive https://github.com/electrikmilk/cherri-macos-app.git Cherri
 ```
 
 ### Requirements
