@@ -119,13 +119,14 @@ struct ContentView: View {
                             }
                         }.buttonStyle(.automatic)
                         
-                        if hasError || compiled {
-                            Spacer().frame(width: 20)
+                        if hasError || hasWarnings || compiled {
+                            Divider()
                         }
                         
                         if hasError {
                             Image(systemName: "x.circle.fill")
                                 .foregroundColor(.red)
+                            Spacer()
                         } else if compiled {
                             Button("Compiled", systemImage: "checkmark.circle.fill") {
                                 NSWorkspace.shared
