@@ -10,42 +10,12 @@ import SwiftUI
 import LanguageSupport
 import CodeEditorView
 
-struct MessageEntry {
-    @Binding var messages: Set<TextLocated<Message>>
-    
-    @Environment(\.presentationMode) private var presentationMode
-    
-    @State private var category:  Message.Category = .error
-    @State private var summary:   String           = ""
-    @State private var lineStr:   String           = ""
-    @State private var columnStr: String           = ""
-    @State private var message:   String           = ""
-}
-
 struct ContentView: View {
     @AppStorage("Cherri.theme")
     private var theme: CodeTheme = .dark
     
-    enum CodeTheme: String, CaseIterable, Identifiable {
-        case light = "Light"
-        case dark = "Dark"
-        
-        var id: CodeTheme {
-            return self
-        }
-    }
-    
     @AppStorage("Cherri.shareWith")
     private var shareWith: ShareOption = .contacts
-    
-    enum ShareOption: String, CaseIterable, Identifiable {
-        case contacts = "Contacts"
-        case anyone = "Anyone"
-        
-        var id: ShareOption {
-            return self
-        }
-    }
     
     @Binding var document: CherriDocument
     @State var fileURL: URL
