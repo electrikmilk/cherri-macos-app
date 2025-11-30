@@ -76,6 +76,8 @@ struct ContentView: View {
     
     @FocusState private var editorIsFocused: Bool
     
+    var editorController: EditorController? = nil
+    
     var body: some View {
         VStack {
             NavigationStack {
@@ -134,11 +136,16 @@ struct ContentView: View {
                         if hasWarnings {
                             Image(systemName: "exclamationmark.triangle.fill")
                                 .foregroundColor(.orange)
+                            Spacer()
                         }
                     }
                 }
             }
-        }.frame(minWidth: 300, minHeight: 600)
+        }
+        .frame(minWidth: 300, minHeight: 600)
+        .onAppear {
+            editorController?.currentContentView = self
+        }
     }
     
     func parseFilepath() {
@@ -177,7 +184,7 @@ struct ContentView: View {
         process.currentDirectoryURL = URL(fileURLWithPath: path)
         
         if openCompiled {
-            process.arguments?.append("-i")
+            process.arguments?.append("--open")
         }
         if shareWith == .anyone {
             process.arguments?.append("--share=anyone")
@@ -246,7 +253,7 @@ struct ContentView: View {
 
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
-        ContentView(document: .constant(CherriDocument(text: "")), fileURL: URL(filePath: "")!)
+        ContentView(document: .constant(CherriDocument(text: "")), fileURL: URL(filePath: ""))
             .preferredColorScheme(.dark)
     }
 }
