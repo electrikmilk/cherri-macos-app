@@ -32,6 +32,7 @@ struct CherriApp: App {
             ContentView(document: file.$document, fileURL: file.fileURL, editorController: editorController)
                 .onAppear {}
         }.commands {
+            ImportCommands()
             CommandMenu("Build") {
                 Button("Build", systemImage: "hammer.fill") {
                     editorController.build()
@@ -56,6 +57,11 @@ struct CherriApp: App {
             }
         }
         
+        Window("Import Shortcut", id: ImportWindow.id) {
+            ImportView()
+        }
+        .windowResizability(.contentSize)
+
         Settings {
             CherriSettings()
         }
