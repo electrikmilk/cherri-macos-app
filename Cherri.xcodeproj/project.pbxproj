@@ -25,6 +25,7 @@
 		72D4674F2B578C9A00547002 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72D4674E2B578C9A00547002 /* AppDelegate.swift */; };
 		72D467512B578CB300547002 /* AboutView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72D467502B578CB300547002 /* AboutView.swift */; };
 		72F863B82B2A870C00A98DE6 /* CherriSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72F863B72B2A870C00A98DE6 /* CherriSettings.swift */; };
+		7230F0A22F2B000100AB0001 /* ShortcutImporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7230F0A12F2B000100AB0001 /* ShortcutImporter.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -66,6 +67,7 @@
 		72D4674E2B578C9A00547002 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		72D467502B578CB300547002 /* AboutView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AboutView.swift; sourceTree = "<group>"; };
 		72F863B72B2A870C00A98DE6 /* CherriSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CherriSettings.swift; sourceTree = "<group>"; };
+		7230F0A12F2B000100AB0001 /* ShortcutImporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShortcutImporter.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -126,6 +128,7 @@
 				720DA3BE2EDBDEC2000086D1 /* CodeTheme.swift */,
 				720DA3BF2EDBDEC2000086D1 /* MessageEntry.swift */,
 				720DA3C32EDBDEDF000086D1 /* ShareOption.swift */,
+				7230F0A12F2B000100AB0001 /* ShortcutImporter.swift */,
 				72213BA52B1D159C00590D99 /* ContentView.swift */,
 				72213BA72B1D159E00590D99 /* Assets.xcassets */,
 				72213BAC2B1D159E00590D99 /* Info.plist */,
@@ -333,6 +336,7 @@
 				72D467512B578CB300547002 /* AboutView.swift in Sources */,
 				72213BA62B1D159C00590D99 /* ContentView.swift in Sources */,
 				720DA3C52EDBDEDF000086D1 /* ShareOption.swift in Sources */,
+				7230F0A22F2B000100AB0001 /* ShortcutImporter.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
