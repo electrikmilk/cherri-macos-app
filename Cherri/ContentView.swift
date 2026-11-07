@@ -64,7 +64,7 @@ struct ContentView: View {
                 CodeEditor(text: $document.text,
                            position: $editPosition,
                            messages: $messages,
-                           language: .swift())
+                           language: .cherri())
                 .environment(\.codeEditorTheme, theme == .dark ? Theme.defaultDark : Theme.defaultLight)
                 .environment(\.codeEditorLayoutConfiguration,
                              CodeEditor.LayoutConfiguration(showMinimap: showMinimap, wrapText: wrapText))
