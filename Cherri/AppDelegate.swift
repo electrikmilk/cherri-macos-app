@@ -18,6 +18,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             let window = NSWindow()
             window.styleMask = styleMask
             window.contentView = NSHostingView(rootView: AboutView())
+            window.center()
             aboutBoxWindowController = NSWindowController(window: window)
         }
 
