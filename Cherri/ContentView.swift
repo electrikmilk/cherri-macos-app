@@ -64,9 +64,10 @@ struct ContentView: View {
                 CodeEditor(text: $document.text,
                            position: $editPosition,
                            messages: $messages,
-                           language: .swift(),
-                           layout: CodeEditor.LayoutConfiguration(showMinimap: showMinimap, wrapText: wrapText))
+                           language: .swift())
                 .environment(\.codeEditorTheme, theme == .dark ? Theme.defaultDark : Theme.defaultLight)
+                .environment(\.codeEditorLayoutConfiguration,
+                             CodeEditor.LayoutConfiguration(showMinimap: showMinimap, wrapText: wrapText))
                 .focused($editorIsFocused)
             }.toolbar {
                 HStack {
@@ -234,7 +235,7 @@ struct ContentView: View {
                                     entity: Message(category: category,
                                                     length: 1,
                                                     summary: summary,
-                                                    description: NSAttributedString(string: messageContent))))
+                                                    description: AttributedString(messageContent))))
     }
 }
 
