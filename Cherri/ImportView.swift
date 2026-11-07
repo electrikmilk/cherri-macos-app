@@ -137,6 +137,7 @@ struct ImportView: View {
             do {
                 let sourceCode = try await importer.importShortcut(from: link)
                 newDocument(CherriDocument(text: sourceCode))
+                link = ""
                 dismissWindow(id: ImportWindow.id)
             } catch {
                 errorMessage = error.localizedDescription
