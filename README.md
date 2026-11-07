@@ -1,10 +1,10 @@
-<img width="256" height="256" alt="Cherri App Icon" src="https://github.com/user-attachments/assets/b6418533-9f27-49a4-8283-93c98a5c8cac" />
+<img width="256" height="256" alt="Cherri App Icon" src="docs/images/app-icon.png" />
 
 # Cherri IDE
 
 IDE for the [Cherri programming language](https://github.com/electrikmilk/cherri).
 
-<img width="1012" height="800" alt="Screenshot 2025-10-03 at 20 09 31" src="https://github.com/user-attachments/assets/5c1de8c3-f28c-4295-94e7-6d1c86f994d6" />
+<img width="1000" alt="Cherri editor with a compiled Shortcut" src="docs/images/editor.png" />
 
 ## Features
 
@@ -16,10 +16,20 @@ Create, edit, save, open, duplicate, rename, etc. Cherri files.
 - 🔨 **Build:** Compile the current Cherri file into a Shortcut.
 - ▶️ **Run:** Compile, then open the compiled Shortcut.
 
+### Import from iCloud
+
+Convert an existing Shortcut to Cherri code. Go to **File -> Import Shortcut...** (**⌘I**), paste the Shortcut's iCloud link and click **Import**. The Shortcut is converted and opened as a new Cherri document.
+
+To get the link, go to Shortcuts -> Share Your Shortcut -> Copy iCloud Link.
+
+This feature is in beta.
+
+<img width="480" alt="Import Shortcut window" src="docs/images/importer.png" />
+
 ### Inline Errors & Warnings
 
-![Screenshot 2023-12-21 at 23 45 09](https://github.com/electrikmilk/cherri-macos-app/assets/4368524/03a85422-5576-4a24-b93c-351d1431f2f0)
-![Screenshot 2023-12-21 at 23 44 58](https://github.com/electrikmilk/cherri-macos-app/assets/4368524/356fafd5-a2a0-461d-a849-6af4e6fbbc2c)
+![Inline compiler error](docs/images/inline-error.png)
+![Inline compiler warning](docs/images/inline-warning.png)
 
 ### Tabs
 
@@ -27,7 +37,7 @@ Enable the tab bar in the Menubar in **View -> Show Tab Bar**. Click the plus bu
 
 If you open a file and it does not open in a new tab, go to your **System Settings** -> **Desktop & Dock** -> Set **Prefer tabs when opening documents** to _Always_.
 
-![Screenshot 2023-12-21 at 23 46 21](https://github.com/electrikmilk/cherri-macos-app/assets/4368524/0ebf3d24-1f59-4886-98c8-85d334663da9)
+![Tab bar with two Cherri files open](docs/images/tabs.png)
 
 ### Document Type
 
@@ -41,7 +51,7 @@ If you have previews on, it shows the contents of the file.
 
 ### Settings
 
-![Screenshot 2023-12-20 at 20 23 53](https://github.com/electrikmilk/cherri-macos-app/assets/4368524/bea9c3bf-4aba-4758-9cdd-be553b8437a1)
+<img width="460" alt="Cherri Settings window" src="docs/images/settings.png" />
 
 ## Dependencies
 
