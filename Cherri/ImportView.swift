@@ -14,6 +14,7 @@ enum ImportWindow {
 struct ImportView: View {
     @Environment(\.newDocument) private var newDocument
     @Environment(\.dismissWindow) private var dismissWindow
+    @Environment(\.colorScheme) private var colorScheme
 
     @State private var link = ""
     @State private var isImporting = false
@@ -21,87 +22,84 @@ struct ImportView: View {
     @FocusState private var linkFieldIsFocused: Bool
 
     private let importer = ShortcutImporter()
-    private let steps = ["Go to Shortcuts", "Share Your Shortcut", "Copy iCloud Link"]
 
     private var canImport: Bool {
         !link.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty && !isImporting
     }
 
     var body: some View {
-        VStack(spacing: 24) {
+        VStack(alignment: .leading, spacing: 20) {
             header
-            stepList
             linkField
+            instructions
             if let errorMessage {
                 errorBanner(errorMessage)
             }
             actions
         }
-        .padding(32)
-        .frame(width: 460)
+        .padding(28)
+        .frame(width: 480)
+        .background(colorScheme == .dark ? Color("BlackCherri") : Color(nsColor: .windowBackgroundColor))
         .onAppear { linkFieldIsFocused = true }
     }
 
     private var header: some View {
-        VStack(spacing: 12) {
-            Image(systemName: "square.and.arrow.down")
-                .font(.system(size: 26, weight: .semibold))
+        HStack(spacing: 8) {
+            Text("Convert Shortcut to Cherri code")
+                .font(.title3)
+                .bold()
+            Text("BETA")
+                .font(.caption.bold())
                 .foregroundStyle(.white)
-                .frame(width: 60, height: 60)
-                .background(
-                    LinearGradient(colors: [.indigo, .purple], startPoint: .topLeading, endPoint: .bottomTrailing),
-                    in: RoundedRectangle(cornerRadius: 14, style: .continuous)
-                )
-                .accessibilityHidden(true)
-
-            HStack(spacing: 8) {
-                Text("Import Shortcut")
-                    .font(.title)
-                    .bold()
-                Text("Beta")
-                    .font(.caption.bold())
-                    .foregroundStyle(.white)
-                    .padding(.horizontal, 8)
-                    .padding(.vertical, 3)
-                    .background(.indigo, in: Capsule())
-            }
-
-            Text("Convert a Shortcut into Cherri code.")
-                .foregroundStyle(.secondary)
+                .padding(.horizontal, 8)
+                .padding(.vertical, 3)
+                .background(Color("CherriPurple"), in: Capsule())
         }
-    }
-
-    private var stepList: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            ForEach(Array(steps.enumerated()), id: \.offset) { index, step in
-                HStack(spacing: 12) {
-                    Text("\(index + 1)")
-                        .font(.caption.bold())
-                        .foregroundStyle(.white)
-                        .frame(width: 22, height: 22)
-                        .background(.indigo, in: Circle())
-                    Text(step)
-                }
-                .accessibilityElement(children: .combine)
-            }
-        }
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(16)
-        .background(.quaternary.opacity(0.5), in: RoundedRectangle(cornerRadius: 12, style: .continuous))
     }
 
     private var linkField: some View {
-        TextField("iCloud link", text: $link, prompt: Text("https://www.icloud.com/shortcuts/..."))
-            .textFieldStyle(.roundedBorder)
-            .controlSize(.large)
-            .focused($linkFieldIsFocused)
-            .disabled(isImporting)
+        HStack(spacing: 10) {
+            Image(systemName: "link.icloud")
+                .font(.title3)
+                .foregroundStyle(Color("CherriRed"))
+                .accessibilityHidden(true)
+
+            TextField("iCloud Link", text: $link)
+                .textFieldStyle(.plain)
+                .font(.title3)
+                .focused($linkFieldIsFocused)
+                .disabled(isImporting)
+        }
+        .padding(.horizontal, 14)
+        .padding(.vertical, 12)
+        .background(Color(nsColor: .controlBackgroundColor), in: RoundedRectangle(cornerRadius: 10, style: .continuous))
+        .overlay(
+            RoundedRectangle(cornerRadius: 10, style: .continuous)
+                .strokeBorder(
+                    linkFieldIsFocused ? Color("CherriRed") : Color.primary.opacity(0.15),
+                    lineWidth: linkFieldIsFocused ? 2 : 1
+                )
+        )
+    }
+
+    private var instructions: some View {
+        HStack(spacing: 6) {
+            Text("Go to Shortcuts")
+            Image(systemName: "arrow.right")
+            Text("Share Your Shortcut")
+            Image(systemName: "arrow.right")
+            Text("Copy iCloud Link").bold()
+        }
+        .font(.callout)
+        .foregroundStyle(.secondary)
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel("Go to Shortcuts, then Share Your Shortcut, then Copy iCloud Link")
     }
 
     private func errorBanner(_ message: String) -> some View {
         Label(message, systemImage: "exclamationmark.triangle.fill")
             .font(.callout)
-            .foregroundStyle(.red)
+            .foregroundStyle(Color("CherriRed"))
             .frame(maxWidth: .infinity, alignment: .leading)
             .fixedSize(horizontal: false, vertical: true)
     }
@@ -119,10 +117,14 @@ struct ImportView: View {
                 HStack(spacing: 6) {
                     if isImporting {
                         ProgressView().controlSize(.small)
+                    } else {
+                        Image(systemName: "icloud.and.arrow.down")
                     }
                     Text(isImporting ? "Importing..." : "Import")
                 }
             }
+            .buttonStyle(.borderedProminent)
+            .tint(Color("CherriGreen"))
             .keyboardShortcut(.defaultAction)
             .disabled(!canImport)
         }
