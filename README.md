@@ -4,7 +4,7 @@
 
 IDE for the [Cherri programming language](https://github.com/electrikmilk/cherri).
 
-<img width="1080" alt="Cherri editor with a compiled Shortcut" src="docs/images/editor.png" />
+<img width="1100" alt="Cherri editor with a compiled Shortcut" src="docs/images/editor.png" />
 
 ## Features
 
@@ -24,7 +24,7 @@ To get the link, go to Shortcuts -> Share Your Shortcut -> Copy iCloud Link.
 
 This feature is in beta.
 
-<img width="560" alt="Import Shortcut window" src="docs/images/importer.png" />
+<img width="580" alt="Import Shortcut window" src="docs/images/importer.png" />
 
 ### Inline Errors & Warnings
 
@@ -51,7 +51,7 @@ If you have previews on, it shows the contents of the file.
 
 ### Settings
 
-<img width="540" alt="Cherri Settings window" src="docs/images/settings.png" />
+<img width="560" alt="Cherri Settings window" src="docs/images/settings.png" />
 
 ## Dependencies
 
