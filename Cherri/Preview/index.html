@@ -1,0 +1,24 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="color-scheme" content="light dark">
+    <link rel="stylesheet" href="main.css">
+</head>
+<body>
+<div id="shortcut-preview"></div>
+<script type="module">
+    import {ShortcutPreview} from './main.mjs';
+
+    const preview = new ShortcutPreview({data: {}});
+
+    window.showShortcutPreview = (plistText, name) => {
+        preview.name = name;
+        preview.load(plistText);
+    };
+
+    window.webkit.messageHandlers.previewReady.postMessage(true);
+</script>
+</body>
+</html>
