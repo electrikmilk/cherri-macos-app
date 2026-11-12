@@ -183,7 +183,7 @@ struct ContentView: View {
 
         shortcutName = fileName.replacingOccurrences(of: ".cherri", with: ".shortcut")
 
-        let nameDefinitionSearch = /^#define name (.*?)\n/
+        let nameDefinitionSearch = /(?m)^#define name (.*)$/
         if let result = try? nameDefinitionSearch.firstMatch(in: "\(document.text)") {
             shortcutName = "\(result.1.replacingOccurrences(of: "%20", with: "")).shortcut"
         }
