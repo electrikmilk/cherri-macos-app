@@ -97,19 +97,26 @@ struct ContentView: View {
                         }
                         
                         if hasError {
-                            Image(systemName: "x.circle.fill")
-                                .foregroundColor(.red)
+                            Button("Unable to compile", systemImage: "x.circle.fill") {
+                                revealFirstMessage(in: .error)
+                            }
+                            .foregroundColor(.red)
+                            .help("Unable to compile")
                             Spacer()
                         } else if compiled {
                             Button("Compiled", systemImage: "checkmark.circle.fill") {
                                 NSWorkspace.shared
                                     .selectFile( "\(shortcutURL!)".replacingOccurrences(of: "%20", with: " "), inFileViewerRootedAtPath: "")
                             }.foregroundColor(.green)
+                            .help("Reveal in Finder")
                         }
                         
                         if hasWarnings {
-                            Image(systemName: "exclamationmark.triangle.fill")
-                                .foregroundColor(.orange)
+                            Button("This file has warnings", systemImage: "exclamationmark.triangle.fill") {
+                                revealFirstMessage(in: .warning)
+                            }
+                            .foregroundColor(.orange)
+                            .help("This file has warnings")
                             Spacer()
                         }
                     }
@@ -212,6 +219,26 @@ struct ContentView: View {
         }
         if !hasError {
             compiled = true
+        }
+    }
+
+    func revealFirstMessage(in category: Message.Category) {
+        let firstMessage = messages
+            .filter { $0.entity.category == category }
+            .min { $0.location.zeroBasedLine < $1.location.zeroBasedLine }
+        guard let firstMessage else { return }
+
+        let lines = document.text.split(separator: "\n", omittingEmptySubsequences: false)
+        let lineIndex = min(firstMessage.location.zeroBasedLine, lines.count - 1)
+        let lineStartOffset = lines.prefix(lineIndex).reduce(0) { $0 + $1.utf16.count + 1 }
+        let columnOffset = min(firstMessage.location.zeroBasedColumn, lines[lineIndex].utf16.count)
+
+        editPosition.selections = [NSRange(location: lineStartOffset + columnOffset, length: 0)]
+        editorIsFocused = true
+
+        Task { @MainActor in
+            await Task.yield()
+            NSApp.sendAction(#selector(NSResponder.centerSelectionInVisibleArea(_:)), to: nil, from: nil)
         }
     }
 
