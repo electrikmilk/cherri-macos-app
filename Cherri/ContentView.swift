@@ -74,7 +74,7 @@ struct ContentView: View {
                     if busy {
                         ProgressView()
                             .controlSize(.small)
-                            .frame(width: 24, height: 24, alignment: .center)
+                            .frame(width: 48, height: 24, alignment: .center)
                     } else {
                         Button("Build", systemImage: "hammer.fill") {
                             Task {
@@ -102,7 +102,6 @@ struct ContentView: View {
                             }
                             .foregroundColor(.red)
                             .help("Unable to compile")
-                            Spacer()
                         } else if compiled {
                             Button("Compiled", systemImage: "checkmark.circle.fill") {
                                 NSWorkspace.shared
@@ -117,7 +116,6 @@ struct ContentView: View {
                             }
                             .foregroundColor(.orange)
                             .help("This file has warnings")
-                            Spacer()
                         }
                     }
                 }
