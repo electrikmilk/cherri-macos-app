@@ -26,11 +26,11 @@ private let cherriTypes = [
     "text", "rawtext", "number", "float", "bool", "array", "dictionary", "variable", "date", "qty"
 ]
 
-private let cherriLiterals = ["true", "false", "nil"]
+private let cherriLiterals = ["nil"]
 
-private let cherriGlobalVariables = [
-    "ShortcutInput", "CurrentDate", "Clipboard", "Device", "Ask", "RepeatItem", "RepeatIndex"
-]
+// Booleans and global variables are emitted as number tokens. Every other regex-driven token kind already has a
+// Cherri-specific color, so they share the theme's numberColour (orange) instead of the keyword color.
+private let cherriNumberRegex = /[0-9]+(?:\.[0-9]+)?|\b(?:true|false|ShortcutInput|CurrentDate|Clipboard|Device|Ask|RepeatItem|RepeatIndex)\b/
 
 // A bare / is excluded when it starts a comment (// or /*).
 private let cherriOperatorRegex = /[+\-*\/]=|[=!]=|<=|>=|<>|&&|\|\||\.\.\.|[=+\-*%<>]|\/(?![\/*])/
@@ -51,7 +51,7 @@ extension LanguageConfiguration {
                               supportsCurlyBrackets: true,
                               stringRegex: /"(?:\\.|[^"\\])*+"|'(?:\\.|[^'\\])*+'/,
                               characterRegex: cherriFunctionCallRegex,
-                              numberRegex: /[0-9]+(?:\.[0-9]+)?/,
+                              numberRegex: cherriNumberRegex,
                               singleLineComment: "//",
                               nestedComment: (open: "/*", close: "*/"),
                               identifierRegex: /@[A-Za-z_][A-Za-z0-9_]*/,
@@ -59,8 +59,7 @@ extension LanguageConfiguration {
                               reservedIdentifiers: cherriKeywords
                                 + cherriPragmas
                                 + cherriTypes
-                                + cherriLiterals
-                                + cherriGlobalVariables,
+                                + cherriLiterals,
                               reservedOperators: cherriNoInputKeywords + cherriDefinitionKeywords)
     }
 }
