@@ -73,9 +73,8 @@ struct ContentView: View {
                 HStack {
                     if busy {
                         ProgressView()
-                            .progressViewStyle(CircularProgressViewStyle())
-                            .scaleEffect(x: 0.5, y: 0.5, anchor: .center)
-                            .padding(EdgeInsets(top: 5, leading: 5, bottom: 5, trailing: 0))
+                            .controlSize(.small)
+                            .frame(width: 24, height: 24, alignment: .center)
                     } else {
                         Button("Build", systemImage: "hammer.fill") {
                             Task {
