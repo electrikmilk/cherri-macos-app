@@ -12,6 +12,10 @@ private let cherriKeywords = [
     "const", "if", "else", "repeat", "for", "in", "menu", "item", "action", "function", "copy", "paste"
 ]
 
+private let cherriPragmas = ["#define", "#question", "#include", "#import", "#ref", "#trigger"]
+
+// Emitted as reserved operators, the only other fixed-lexeme token kind, so they get the theme's
+// symbolColour instead of sharing the keyword color with pragmas.
 private let cherriDefinitionKeywords = [
     "name", "color", "glyph", "inputs", "outputs", "from", "version", "mac", "noinput", "quickactions"
 ]
@@ -31,28 +35,32 @@ private let cherriGlobalVariables = [
 // A bare / is excluded when it starts a comment (// or /*).
 private let cherriOperatorRegex = /[+\-*\/]=|[=!]=|<=|>=|<>|&&|\|\||\.\.\.|[=+\-*%<>]|\/(?![\/*])/
 
+// Actions and user functions are both called as name(...). CodeEditorView has no token kind for function
+// calls and Cherri has no character literals, so calls are emitted as the character token and given their
+// own color through the theme's characterColour.
+private let cherriFunctionCallRegex = /[A-Za-z_][A-Za-z0-9_]*(?=\()/
+
 extension LanguageConfiguration {
 
     /// Language configuration for Cherri, based on the keywords the Cherri compiler recognizes.
     static func cherri() -> LanguageConfiguration {
-        // Pragmas (#define) and variables (@name) are matched as identifiers because reserved identifiers
-        // require a word boundary, which cannot precede # or @.
+        // Only @variables are matched as identifiers. Constants and parameters are bare names that no token
+        // matches, so they render in the theme's plain text color.
         LanguageConfiguration(name: "Cherri",
                               supportsSquareBrackets: true,
                               supportsCurlyBrackets: true,
                               stringRegex: /"(?:\\.|[^"\\])*+"|'(?:\\.|[^'\\])*+'/,
-                              characterRegex: nil,
+                              characterRegex: cherriFunctionCallRegex,
                               numberRegex: /[0-9]+(?:\.[0-9]+)?/,
                               singleLineComment: "//",
                               nestedComment: (open: "/*", close: "*/"),
-                              identifierRegex: /[@#]?[A-Za-z_][A-Za-z0-9_]*/,
+                              identifierRegex: /@[A-Za-z_][A-Za-z0-9_]*/,
                               operatorRegex: cherriOperatorRegex,
                               reservedIdentifiers: cherriKeywords
-                                + cherriDefinitionKeywords
-                                + cherriNoInputKeywords
+                                + cherriPragmas
                                 + cherriTypes
                                 + cherriLiterals
                                 + cherriGlobalVariables,
-                              reservedOperators: [])
+                              reservedOperators: cherriNoInputKeywords + cherriDefinitionKeywords)
     }
 }
