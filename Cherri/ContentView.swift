@@ -88,7 +88,7 @@ struct ContentView: View {
                     if busy {
                         ProgressView()
                             .controlSize(.small)
-                            .frame(width: 48, height: 24, alignment: .center)
+                            .frame(height: 24)
                     } else {
                         Button("Build", systemImage: "hammer.fill") {
                             Task {
