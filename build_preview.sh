@@ -2,17 +2,20 @@
 set -e
 
 PATH=/usr/bin:/usr/local/bin:/opt/local/bin:/bin:/opt/homebrew/bin:$PATH
+hash -r git
 hash -r yarn
 hash -r cp
 
-PREVIEW_SHORTCUT_DIR="${PREVIEW_SHORTCUT_DIR:-$HOME/preview-shortcut}"
+cd "$(dirname "$0")"
 
-if [ ! -d "$PREVIEW_SHORTCUT_DIR" ]; then
-    echo "preview-shortcut not found at $PREVIEW_SHORTCUT_DIR (set PREVIEW_SHORTCUT_DIR to override)" >&2
-    exit 1
-fi
+git submodule update --init --recursive Cherri/PreviewShortcut
 
-(cd "$PREVIEW_SHORTCUT_DIR" && yarn install --frozen-lockfile && yarn build)
+# Build outside the repo: node_modules is thousands of files, which stalls folders synced by iCloud.
+build_directory="$(mktemp -d)"
+trap 'rm -rf "$build_directory"' EXIT
 
-cp "$PREVIEW_SHORTCUT_DIR/dist/main.mjs" Cherri/Preview/main.mjs
-cp "$PREVIEW_SHORTCUT_DIR/dist/main.css" Cherri/Preview/main.css
+cp -R Cherri/PreviewShortcut/. "$build_directory"
+(cd "$build_directory" && yarn install --frozen-lockfile && yarn build)
+
+cp "$build_directory/dist/main.mjs" Cherri/Preview/main.mjs
+cp "$build_directory/dist/main.css" Cherri/Preview/main.css
