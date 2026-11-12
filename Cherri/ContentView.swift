@@ -76,7 +76,15 @@ struct ContentView: View {
                              CodeEditor.LayoutConfiguration(showMinimap: showMinimap, wrapText: wrapText))
                 .focused($editorIsFocused)
             }.toolbar {
-                HStack {
+                if !busy && (hasError || hasWarnings || compiled) {
+                    ToolbarItemGroup {
+                        buildStatus
+                    }
+
+                    toolbarGroupSeparator
+                }
+
+                ToolbarItemGroup {
                     if busy {
                         ProgressView()
                             .controlSize(.small)
@@ -84,47 +92,25 @@ struct ContentView: View {
                     } else {
                         Button("Build", systemImage: "hammer.fill") {
                             Task {
-                                await compileFile(openCompiled: false)
+                                await compileFile()
                             }
                         }
                         .buttonStyle(.automatic)
                         .disabled(fileURL == nil)
 
-                        Button("Run", systemImage: "play.fill") {
-                            Task {
-                                await compileFile(openCompiled: true)
+                        if compiled {
+                            Button("Export", systemImage: "square.and.arrow.up") {
+                                exportShortcut()
                             }
-                        }
-                        .buttonStyle(.automatic)
-                        .disabled(fileURL == nil)
-                        
-                        if hasError || hasWarnings || compiled {
-                            Divider()
-                        }
-                        
-                        if hasError {
-                            Button("Unable to compile", systemImage: "xmark.octagon.fill") {
-                                revealFirstMessage(in: .error)
-                            }
-                            .foregroundColor(.red)
-                            .help("Unable to compile")
-                        } else if compiled {
-                            Button("Compiled", systemImage: "checkmark.circle.fill") {
-                                NSWorkspace.shared
-                                    .selectFile( "\(shortcutURL!)".replacingOccurrences(of: "%20", with: " "), inFileViewerRootedAtPath: "")
-                            }.foregroundColor(.green)
-                            .help("Reveal in Finder")
-                        }
-                        
-                        if hasWarnings {
-                            Button("This file has warnings", systemImage: "exclamationmark.triangle.fill") {
-                                revealFirstMessage(in: .warning)
-                            }
-                            .foregroundColor(.orange)
-                            .help("This file has warnings")
+                            .buttonStyle(.automatic)
+                            .help("Open in Shortcuts")
                         }
                     }
+                }
 
+                toolbarGroupSeparator
+
+                ToolbarItem {
                     Button("Preview", systemImage: "sidebar.trailing") {
                         showPreview.toggle()
                     }
@@ -142,6 +128,49 @@ struct ContentView: View {
         }
     }
     
+    /// Without a spacer, macOS 26 merges neighboring toolbar items into a single capsule.
+    @ToolbarContentBuilder
+    private var toolbarGroupSeparator: some ToolbarContent {
+        if #available(macOS 26.0, *) {
+            ToolbarSpacer(.fixed)
+        }
+    }
+
+    private var warningCount: Int {
+        messages.filter { $0.entity.category == .warning }.count
+    }
+
+    @ViewBuilder
+    private var buildStatus: some View {
+        if hasError {
+            Button("Unable to compile", systemImage: "xmark.octagon.fill") {
+                revealFirstMessage(in: .error)
+            }
+            .foregroundColor(.red)
+            .help("Unable to compile")
+        } else if compiled {
+            Button("Compiled", systemImage: "checkmark.circle.fill") {
+                NSWorkspace.shared
+                    .selectFile( "\(shortcutURL!)".replacingOccurrences(of: "%20", with: " "), inFileViewerRootedAtPath: "")
+            }.foregroundColor(.green)
+            .help("Reveal in Finder")
+        }
+
+        if hasWarnings {
+            Button {
+                revealFirstMessage(in: .warning)
+            } label: {
+                HStack(spacing: 4) {
+                    Image(systemName: "exclamationmark.triangle.fill")
+                    Text("\(warningCount)")
+                }
+            }
+            .foregroundColor(.orange)
+            .help("This file has warnings")
+            .accessibilityLabel("\(warningCount) warnings")
+        }
+    }
+
     func parseFilepath() {
         guard let fileURL = fileURL else { return }
 
@@ -162,7 +191,7 @@ struct ContentView: View {
         shortcutURL = URL(string: "\(path)/\(shortcutName.replacingOccurrences(of: "%20", with: ""))")!
     }
     
-    func compileFile(openCompiled: Bool) async {
+    func compileFile() async {
         guard let fileURL = fileURL else { return }
         
         busy = true
@@ -178,38 +207,62 @@ struct ContentView: View {
         compiled = false
         hasError = false
         hasWarnings = false
+        hasPreview = false
 
         parseFilepath()
 
         messages.removeAll()
 
-        let process = Process()
+        do {
+            try await buildShortcut(fileURL: fileURL)
+        } catch {
+            hasError = true
+            createMessage(message: error.localizedDescription, summary: "Error", category: Message.Category.error)
+        }
 
-        let bundle = Bundle.main
-        process.executableURL = bundle.url(forResource: "cherri_binary", withExtension: "")
-        process.arguments = [fileURL.relativePath, "--no-ansi"]
-        process.currentDirectoryURL = URL(fileURLWithPath: path)
-        
-        if openCompiled {
-            process.arguments?.append("--open")
-        }
-        if shareWith == .anyone {
-            process.arguments?.append("--share=anyone")
-        }
-        
-        let pipe = Pipe()
-        process.standardInput = nil
-        process.standardOutput = pipe
-        process.standardError = pipe
-        
-        process.launch()
-        
-        let data = pipe.fileHandleForReading.readDataToEndOfFile()
-        let output = String(data: data, encoding: .utf8)!
-        
-        handleCompilerOutput(output: "\(output)\n\n")
-        
         busy = false
+    }
+
+    func exportShortcut() {
+        guard compiled else { return }
+        NSWorkspace.shared.open(signedShortcutFileURL)
+    }
+
+    private var signedShortcutFileURL: URL {
+        URL(fileURLWithPath: path, isDirectory: true)
+            .appendingPathComponent(shortcutName.replacingOccurrences(of: "%20", with: ""))
+    }
+
+    /// The compiler is not asked to sign so the unsigned plist stays on disk for the preview, then we sign it ourselves.
+    private func buildShortcut(fileURL: URL) async throws {
+        guard let compilerURL = Bundle.main.url(forResource: "cherri_binary", withExtension: "") else {
+            throw BuildError.compilerMissing
+        }
+
+        let compilation = try await ProcessRunner.run(executableURL: compilerURL,
+                                                      arguments: [fileURL.relativePath, "--no-ansi", "--skip-sign"],
+                                                      currentDirectoryURL: URL(fileURLWithPath: path))
+        handleCompilerOutput(output: "\(compilation.output)\n\n")
+
+        guard !hasError else { return }
+        guard compilation.status == 0 else {
+            throw BuildError.compilerExited(status: compilation.status, output: compilation.output)
+        }
+
+        let signedURL = signedShortcutFileURL
+        let workflowName = signedURL.deletingPathExtension().lastPathComponent
+        let unsignedURL = signedURL.deletingLastPathComponent().appendingPathComponent("\(workflowName)_unsigned.shortcut")
+        guard FileManager.default.fileExists(atPath: unsignedURL.path) else {
+            throw BuildError.unsignedShortcutMissing(unsignedURL.lastPathComponent)
+        }
+        defer { try? FileManager.default.removeItem(at: unsignedURL) }
+
+        let plist = try String(contentsOf: unsignedURL, encoding: .utf8)
+        try await ShortcutSigner.sign(unsignedURL: unsignedURL, signedURL: signedURL, shareWith: shareWith)
+
+        previewController.show(plist: plist, name: workflowName)
+        hasPreview = true
+        compiled = true
     }
 
     func handleCompilerOutput(output: String) {
@@ -229,9 +282,6 @@ struct ContentView: View {
             if let error = try? errorSearch.firstMatch(in: output) {
                 createMessage(message: String(error.1), summary: "Error", category: Message.Category.error)
             }
-        }
-        if !hasError {
-            compiled = true
         }
     }
 
@@ -275,6 +325,23 @@ struct ContentView: View {
                                                     length: 1,
                                                     summary: summary,
                                                     description: AttributedString(messageContent))))
+    }
+}
+
+private enum BuildError: LocalizedError {
+    case compilerMissing
+    case compilerExited(status: Int32, output: String)
+    case unsignedShortcutMissing(String)
+
+    var errorDescription: String? {
+        switch self {
+        case .compilerMissing:
+            return "The Cherri compiler is missing from the app bundle."
+        case .compilerExited(let status, let output):
+            return "The Cherri compiler exited with status \(status).\n\(output)"
+        case .unsignedShortcutMissing(let fileName):
+            return "The compiler did not produce \(fileName)."
+        }
     }
 }
 

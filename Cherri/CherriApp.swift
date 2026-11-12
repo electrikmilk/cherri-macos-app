@@ -12,12 +12,14 @@ class EditorController: ObservableObject {
     @Published var currentContentView: ContentView? = nil
     func build() {
         Task {
-            await currentContentView?.compileFile(openCompiled: false)
+            await currentContentView?.compileFile()
         }
     }
     func buildAndOpen() {
         Task {
-            await currentContentView?.compileFile(openCompiled: true)
+            guard let contentView = currentContentView else { return }
+            await contentView.compileFile()
+            contentView.exportShortcut()
         }
     }
 }
