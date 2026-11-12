@@ -65,7 +65,7 @@ struct ContentView: View {
                            position: $editPosition,
                            messages: $messages,
                            language: .cherri())
-                .environment(\.codeEditorTheme, theme == .dark ? Theme.defaultDark : Theme.defaultLight)
+                .environment(\.codeEditorTheme, theme.editorTheme)
                 .environment(\.codeEditorLayoutConfiguration,
                              CodeEditor.LayoutConfiguration(showMinimap: showMinimap, wrapText: wrapText))
                 .focused($editorIsFocused)
