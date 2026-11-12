@@ -1,3 +1,6 @@
 [submodule "Cherri/Compiler"]
 	path = Cherri/Compiler
 	url = https://github.com/electrikmilk/cherri
+[submodule "Cherri/PreviewShortcut"]
+	path = Cherri/PreviewShortcut
+	url = https://github.com/electrikmilk/preview-shortcut
