@@ -24,6 +24,9 @@
 		724298CC2E89844900BF5234 /* CherriAppIcon.icon in Resources */ = {isa = PBXBuildFile; fileRef = 724298CB2E89844900BF5234 /* CherriAppIcon.icon */; };
 		728358452D5EB38A007F02AD /* cherri_binary in Resources */ = {isa = PBXBuildFile; fileRef = 72213BD42B1D24EB00590D99 /* cherri_binary */; };
 		7230F0B22F2C000100AB0001 /* Preview in Resources */ = {isa = PBXBuildFile; fileRef = 7230F0B12F2C000100AB0001 /* Preview */; };
+		7230F0B42F2C000100AB0001 /* PreviewSchemeHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7230F0B32F2C000100AB0001 /* PreviewSchemeHandler.swift */; };
+		7230F0B62F2C000100AB0001 /* ShortcutPreviewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7230F0B52F2C000100AB0001 /* ShortcutPreviewController.swift */; };
+		7230F0B82F2C000100AB0001 /* PreviewPane.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7230F0B72F2C000100AB0001 /* PreviewPane.swift */; };
 		72D4674F2B578C9A00547002 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72D4674E2B578C9A00547002 /* AppDelegate.swift */; };
 		72D467512B578CB300547002 /* AboutView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72D467502B578CB300547002 /* AboutView.swift */; };
 		72F863B82B2A870C00A98DE6 /* CherriSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72F863B72B2A870C00A98DE6 /* CherriSettings.swift */; };
@@ -68,6 +71,9 @@
 		72213BC22B1D159E00590D99 /* CherriUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CherriUITestsLaunchTests.swift; sourceTree = "<group>"; };
 		72213BD42B1D24EB00590D99 /* cherri_binary */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; path = cherri_binary; sourceTree = "<group>"; };
 		7230F0B12F2C000100AB0001 /* Preview */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Preview; sourceTree = "<group>"; };
+		7230F0B32F2C000100AB0001 /* PreviewSchemeHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreviewSchemeHandler.swift; sourceTree = "<group>"; };
+		7230F0B52F2C000100AB0001 /* ShortcutPreviewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShortcutPreviewController.swift; sourceTree = "<group>"; };
+		7230F0B72F2C000100AB0001 /* PreviewPane.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreviewPane.swift; sourceTree = "<group>"; };
 		724298CB2E89844900BF5234 /* CherriAppIcon.icon */ = {isa = PBXFileReference; lastKnownFileType = folder.iconcomposer.icon; path = CherriAppIcon.icon; sourceTree = "<group>"; };
 		72D4674E2B578C9A00547002 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		72D467502B578CB300547002 /* AboutView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AboutView.swift; sourceTree = "<group>"; };
@@ -131,6 +137,9 @@
 				72D467502B578CB300547002 /* AboutView.swift */,
 				72213BA32B1D159C00590D99 /* CherriDocument.swift */,
 				72213BD42B1D24EB00590D99 /* cherri_binary */,
+				7230F0B72F2C000100AB0001 /* PreviewPane.swift */,
+				7230F0B52F2C000100AB0001 /* ShortcutPreviewController.swift */,
+				7230F0B32F2C000100AB0001 /* PreviewSchemeHandler.swift */,
 				7230F0B12F2C000100AB0001 /* Preview */,
 				720DA3BE2EDBDEC2000086D1 /* CodeTheme.swift */,
 				720DA3C52EDBDF00000086D2 /* CherriLanguage.swift */,
@@ -341,6 +350,9 @@
 				72F863B82B2A870C00A98DE6 /* CherriSettings.swift in Sources */,
 				72213BA42B1D159C00590D99 /* CherriDocument.swift in Sources */,
 				72D4674F2B578C9A00547002 /* AppDelegate.swift in Sources */,
+				7230F0B82F2C000100AB0001 /* PreviewPane.swift in Sources */,
+				7230F0B62F2C000100AB0001 /* ShortcutPreviewController.swift in Sources */,
+				7230F0B42F2C000100AB0001 /* PreviewSchemeHandler.swift in Sources */,
 				720DA3C02EDBDEC3000086D1 /* CodeTheme.swift in Sources */,
 				720DA3C62EDBDF00000086D3 /* CherriLanguage.swift in Sources */,
 				720DA3C12EDBDEC3000086D1 /* MessageEntry.swift in Sources */,
