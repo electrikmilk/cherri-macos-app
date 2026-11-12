@@ -43,7 +43,13 @@ struct ContentView: View {
     @State private var hasWarnings:      Bool                      = false
     @State private var busy:             Bool                      = false
     @State private var compiled:         Bool                      = false
-    
+    @State private var hasPreview:       Bool                      = false
+
+    @AppStorage("Cherri.showPreview")
+    private var showPreview:             Bool                      = true
+
+    @StateObject private var previewController = ShortcutPreviewController()
+
     @FocusState private var editorIsFocused: Bool
 
     @ObservedObject var editorController: EditorController
@@ -118,8 +124,17 @@ struct ContentView: View {
                             .help("This file has warnings")
                         }
                     }
+
+                    Button("Preview", systemImage: "sidebar.trailing") {
+                        showPreview.toggle()
+                    }
+                    .help(showPreview ? "Hide Preview" : "Show Preview")
                 }
             }
+        }
+        .inspector(isPresented: $showPreview) {
+            PreviewPane(controller: previewController, isBuilding: busy, hasPreview: hasPreview)
+                .inspectorColumnWidth(min: 280, ideal: 380, max: 600)
         }
         .frame(minWidth: 300, minHeight: 600)
         .onAppear {
