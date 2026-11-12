@@ -67,6 +67,7 @@ git clone --recursive https://github.com/electrikmilk/cherri-macos-app.git Cherr
 
 - XCode - Download from the Mac App Store.
 - Go - Install from Homebrew or [go.dev](https://go.dev/dl/).
+- Node.js and Yarn - Only needed to update the preview.
 
 ### Run
 
@@ -74,3 +75,11 @@ git clone --recursive https://github.com/electrikmilk/cherri-macos-app.git Cherr
 2. Click the play icon button to build the project after it has been indexed.
 
 This should "install" the project on your Mac, at least temporarily. But if it disappears due to being an unsigned app, just follow the steps above to re-install.
+
+### Update the preview
+
+The Shortcut preview comes from the [preview-shortcut](https://github.com/electrikmilk/preview-shortcut) submodule at `Cherri/PreviewShortcut`. Its built files are committed in `Cherri/Preview`, so Node.js and Yarn are only needed when updating it.
+
+1. Pull the latest preview-shortcut: `git submodule update --remote Cherri/PreviewShortcut`
+2. Build it and copy the result into the app: `./build_preview.sh`
+3. Commit the updated submodule and the files in `Cherri/Preview`.
