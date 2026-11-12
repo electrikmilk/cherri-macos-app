@@ -97,7 +97,7 @@ struct ContentView: View {
                         }
                         
                         if hasError {
-                            Button("Unable to compile", systemImage: "x.circle.fill") {
+                            Button("Unable to compile", systemImage: "xmark.octagon.fill") {
                                 revealFirstMessage(in: .error)
                             }
                             .foregroundColor(.red)
