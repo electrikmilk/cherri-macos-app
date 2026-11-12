@@ -28,6 +28,9 @@ private let cherriGlobalVariables = [
     "ShortcutInput", "CurrentDate", "Clipboard", "Device", "Ask", "RepeatItem", "RepeatIndex"
 ]
 
+// A bare / is excluded when it starts a comment (// or /*).
+private let cherriOperatorRegex = /[+\-*\/]=|[=!]=|<=|>=|<>|&&|\|\||\.\.\.|[=+\-*%<>]|\/(?![\/*])/
+
 extension LanguageConfiguration {
 
     /// Language configuration for Cherri, based on the keywords the Cherri compiler recognizes.
@@ -43,7 +46,7 @@ extension LanguageConfiguration {
                               singleLineComment: "//",
                               nestedComment: (open: "/*", close: "*/"),
                               identifierRegex: /[@#]?[A-Za-z_][A-Za-z0-9_]*/,
-                              operatorRegex: nil,
+                              operatorRegex: cherriOperatorRegex,
                               reservedIdentifiers: cherriKeywords
                                 + cherriDefinitionKeywords
                                 + cherriNoInputKeywords
