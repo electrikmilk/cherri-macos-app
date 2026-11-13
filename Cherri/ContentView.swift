@@ -50,6 +50,8 @@ struct ContentView: View {
 
     @StateObject private var previewController = ShortcutPreviewController()
 
+    @StateObject private var languageService = CherriLanguageService()
+
     @FocusState private var editorIsFocused: Bool
 
     @ObservedObject var editorController: EditorController
@@ -70,7 +72,7 @@ struct ContentView: View {
                 CodeEditor(text: $document.text,
                            position: $editPosition,
                            messages: $messages,
-                           language: .cherri())
+                           language: .cherri(languageService: languageService))
                 .environment(\.codeEditorTheme, theme.editorTheme)
                 .environment(\.codeEditorLayoutConfiguration,
                              CodeEditor.LayoutConfiguration(showMinimap: showMinimap, wrapText: wrapText))
