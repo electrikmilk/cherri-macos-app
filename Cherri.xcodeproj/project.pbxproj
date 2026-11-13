@@ -28,6 +28,9 @@
 		7230F0B62F2C000100AB0001 /* ShortcutPreviewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7230F0B52F2C000100AB0001 /* ShortcutPreviewController.swift */; };
 		7230F0B82F2C000100AB0001 /* PreviewPane.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7230F0B72F2C000100AB0001 /* PreviewPane.swift */; };
 		7230F0BA2F2C000100AB0001 /* ProcessRunner.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7230F0B92F2C000100AB0001 /* ProcessRunner.swift */; };
+		7230F0C10000000000AB0002 /* CherriCatalog.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7230F0C10000000000AB0001 /* CherriCatalog.swift */; };
+		7230F0C20000000000AB0002 /* CherriCompletionContext.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7230F0C20000000000AB0001 /* CherriCompletionContext.swift */; };
+		7230F0C30000000000AB0002 /* CherriLanguageService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7230F0C30000000000AB0001 /* CherriLanguageService.swift */; };
 		7230F0BC2F2C000100AB0001 /* ShortcutSigner.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7230F0BB2F2C000100AB0001 /* ShortcutSigner.swift */; };
 		72D4674F2B578C9A00547002 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72D4674E2B578C9A00547002 /* AppDelegate.swift */; };
 		72D467512B578CB300547002 /* AboutView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72D467502B578CB300547002 /* AboutView.swift */; };
@@ -77,6 +80,9 @@
 		7230F0B52F2C000100AB0001 /* ShortcutPreviewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShortcutPreviewController.swift; sourceTree = "<group>"; };
 		7230F0B72F2C000100AB0001 /* PreviewPane.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreviewPane.swift; sourceTree = "<group>"; };
 		7230F0B92F2C000100AB0001 /* ProcessRunner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProcessRunner.swift; sourceTree = "<group>"; };
+		7230F0C10000000000AB0001 /* CherriCatalog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CherriCatalog.swift; sourceTree = "<group>"; };
+		7230F0C20000000000AB0001 /* CherriCompletionContext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CherriCompletionContext.swift; sourceTree = "<group>"; };
+		7230F0C30000000000AB0001 /* CherriLanguageService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CherriLanguageService.swift; sourceTree = "<group>"; };
 		7230F0BB2F2C000100AB0001 /* ShortcutSigner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShortcutSigner.swift; sourceTree = "<group>"; };
 		724298CB2E89844900BF5234 /* CherriAppIcon.icon */ = {isa = PBXFileReference; lastKnownFileType = folder.iconcomposer.icon; path = CherriAppIcon.icon; sourceTree = "<group>"; };
 		72D4674E2B578C9A00547002 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -143,6 +149,9 @@
 				72213BD42B1D24EB00590D99 /* cherri_binary */,
 				7230F0BB2F2C000100AB0001 /* ShortcutSigner.swift */,
 				7230F0B92F2C000100AB0001 /* ProcessRunner.swift */,
+				7230F0C10000000000AB0001 /* CherriCatalog.swift */,
+				7230F0C20000000000AB0001 /* CherriCompletionContext.swift */,
+				7230F0C30000000000AB0001 /* CherriLanguageService.swift */,
 				7230F0B72F2C000100AB0001 /* PreviewPane.swift */,
 				7230F0B52F2C000100AB0001 /* ShortcutPreviewController.swift */,
 				7230F0B32F2C000100AB0001 /* PreviewSchemeHandler.swift */,
@@ -358,6 +367,9 @@
 				72D4674F2B578C9A00547002 /* AppDelegate.swift in Sources */,
 				7230F0BC2F2C000100AB0001 /* ShortcutSigner.swift in Sources */,
 				7230F0BA2F2C000100AB0001 /* ProcessRunner.swift in Sources */,
+				7230F0C10000000000AB0002 /* CherriCatalog.swift in Sources */,
+				7230F0C20000000000AB0002 /* CherriCompletionContext.swift in Sources */,
+				7230F0C30000000000AB0002 /* CherriLanguageService.swift in Sources */,
 				7230F0B82F2C000100AB0001 /* PreviewPane.swift in Sources */,
 				7230F0B62F2C000100AB0001 /* ShortcutPreviewController.swift in Sources */,
 				7230F0B42F2C000100AB0001 /* PreviewSchemeHandler.swift in Sources */,

@@ -8,25 +8,27 @@
 import Foundation
 import LanguageSupport
 
-private let cherriKeywords = [
+let cherriKeywords = [
     "const", "if", "else", "repeat", "for", "in", "menu", "item", "action", "function", "copy", "paste"
 ]
 
-private let cherriPragmas = ["#define", "#question", "#include", "#import", "#ref", "#trigger"]
+let cherriPragmas = ["#define", "#question", "#include", "#import", "#ref", "#trigger"]
 
 // Emitted as reserved operators, the only other fixed-lexeme token kind, so they get the theme's
 // symbolColour instead of sharing the keyword color with pragmas.
-private let cherriDefinitionKeywords = [
+let cherriDefinitionKeywords = [
     "name", "color", "glyph", "inputs", "outputs", "from", "version", "mac", "noinput", "quickactions"
 ]
 
-private let cherriNoInputKeywords = ["stopwith", "askfor", "getclipboard"]
+let cherriNoInputKeywords = ["stopwith", "askfor", "getclipboard"]
 
-private let cherriTypes = [
+let cherriTypes = [
     "text", "rawtext", "number", "float", "bool", "array", "dictionary", "variable", "date", "qty"
 ]
 
-private let cherriLiterals = ["nil"]
+let cherriLiterals = ["nil"]
+
+let cherriBooleans = ["true", "false"]
 
 // Booleans and global variables are emitted as number tokens. Every other regex-driven token kind already has a
 // Cherri-specific color, so they share the theme's numberColour (orange) instead of the keyword color.
@@ -43,7 +45,7 @@ private let cherriFunctionCallRegex = /[A-Za-z_][A-Za-z0-9_]*(?=\()/
 extension LanguageConfiguration {
 
     /// Language configuration for Cherri, based on the keywords the Cherri compiler recognizes.
-    static func cherri() -> LanguageConfiguration {
+    static func cherri(languageService: LanguageService? = nil) -> LanguageConfiguration {
         // Only @variables are matched as identifiers. Constants and parameters are bare names that no token
         // matches, so they render in the theme's plain text color.
         LanguageConfiguration(name: "Cherri",
@@ -60,6 +62,7 @@ extension LanguageConfiguration {
                                 + cherriPragmas
                                 + cherriTypes
                                 + cherriLiterals,
-                              reservedOperators: cherriNoInputKeywords + cherriDefinitionKeywords)
+                              reservedOperators: cherriNoInputKeywords + cherriDefinitionKeywords,
+                              languageService: languageService)
     }
 }
