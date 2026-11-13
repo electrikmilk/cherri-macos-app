@@ -236,14 +236,31 @@ struct ContentView: View {
     }
 
     /// The compiler is not asked to sign so the unsigned plist stays on disk for the preview, then we sign it ourselves.
+    /// One compile in debug mode signs the Shortcut and also writes its plist, which the preview needs. Debug mode also
+    /// writes a processed copy of the source, so both files are removed after the build.
     private func buildShortcut(fileURL: URL) async throws {
         guard let compilerURL = Bundle.main.url(forResource: "cherri_binary", withExtension: "") else {
             throw BuildError.compilerMissing
         }
 
+        let workingDirectoryURL = URL(fileURLWithPath: path)
+        var compilerArguments = [fileURL.relativePath, "--no-ansi", "--debug"]
+        if shareWith == .anyone {
+            compilerArguments.append("--share=anyone")
+        }
+
+        let processedSourceURL = workingDirectoryURL
+            .appendingPathComponent("\(fileURL.deletingPathExtension().lastPathComponent)_processed.cherri")
+        let processedSourceExisted = FileManager.default.fileExists(atPath: processedSourceURL.path)
+        defer {
+            if !processedSourceExisted {
+                try? FileManager.default.removeItem(at: processedSourceURL)
+            }
+        }
+
         let compilation = try await ProcessRunner.run(executableURL: compilerURL,
-                                                      arguments: [fileURL.relativePath, "--no-ansi", "--skip-sign"],
-                                                      currentDirectoryURL: URL(fileURLWithPath: path))
+                                                      arguments: compilerArguments,
+                                                      currentDirectoryURL: workingDirectoryURL)
         handleCompilerOutput(output: "\(compilation.output)\n\n")
 
         guard !hasError else { return }
@@ -251,18 +268,15 @@ struct ContentView: View {
             throw BuildError.compilerExited(status: compilation.status, output: compilation.output)
         }
 
-        let signedURL = signedShortcutFileURL
-        let workflowName = signedURL.deletingPathExtension().lastPathComponent
-        let unsignedURL = signedURL.deletingLastPathComponent().appendingPathComponent("\(workflowName)_unsigned.shortcut")
-        guard FileManager.default.fileExists(atPath: unsignedURL.path) else {
-            throw BuildError.unsignedShortcutMissing(unsignedURL.lastPathComponent)
+        let workflowName = signedShortcutFileURL.deletingPathExtension().lastPathComponent
+        let plistFileName = "\(workflowName).plist"
+        let plistURL = workingDirectoryURL.appendingPathComponent(plistFileName)
+        guard FileManager.default.fileExists(atPath: plistURL.path) else {
+            throw BuildError.plistMissing(plistFileName)
         }
-        defer { try? FileManager.default.removeItem(at: unsignedURL) }
+        defer { try? FileManager.default.removeItem(at: plistURL) }
 
-        let plist = try String(contentsOf: unsignedURL, encoding: .utf8)
-        try await ShortcutSigner.sign(unsignedURL: unsignedURL, signedURL: signedURL, shareWith: shareWith)
-
-        previewController.show(plist: plist, name: workflowName)
+        previewController.show(plist: try String(contentsOf: plistURL, encoding: .utf8), name: workflowName)
         hasPreview = true
         compiled = true
     }
@@ -333,7 +347,7 @@ struct ContentView: View {
 private enum BuildError: LocalizedError {
     case compilerMissing
     case compilerExited(status: Int32, output: String)
-    case unsignedShortcutMissing(String)
+    case plistMissing(String)
 
     var errorDescription: String? {
         switch self {
@@ -341,7 +355,7 @@ private enum BuildError: LocalizedError {
             return "The Cherri compiler is missing from the app bundle."
         case .compilerExited(let status, let output):
             return "The Cherri compiler exited with status \(status).\n\(output)"
-        case .unsignedShortcutMissing(let fileName):
+        case .plistMissing(let fileName):
             return "The compiler did not produce \(fileName)."
         }
     }

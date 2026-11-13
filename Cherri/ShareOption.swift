@@ -14,13 +14,4 @@ enum ShareOption: String, CaseIterable, Identifiable {
     var id: ShareOption {
         return self
     }
-
-    var signingMode: String {
-        switch self {
-        case .contacts:
-            return "people-who-know-me"
-        case .anyone:
-            return "anyone"
-        }
-    }
 }
