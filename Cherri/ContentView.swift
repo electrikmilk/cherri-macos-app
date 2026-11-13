@@ -300,9 +300,13 @@ struct ContentView: View {
         if output.contains("Error:") || output.contains("panic:") {
             hasError = true
             
+            // Messages can contain blank lines, so a located error is read up to its trailing (line:column).
+            let locatedErrorSearch = /(?s)Error: (?<message>.*?\(\d+:\d+\))\n/
             let errorSearch = /Error: (?<message>(.|\n)*?)\n\n/
-            if let error = try? errorSearch.firstMatch(in: output) {
-                createMessage(message: String(error.1), summary: "Error", category: Message.Category.error)
+            let errorMessage = output.firstMatch(of: locatedErrorSearch).map { String($0.message) }
+                ?? output.firstMatch(of: errorSearch).map { String($0.message) }
+            if let errorMessage {
+                createMessage(message: errorMessage, summary: "Error", category: Message.Category.error)
             }
         }
     }
