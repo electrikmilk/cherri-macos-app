@@ -291,6 +291,12 @@ struct ContentView: View {
                 createMessage(message: String(match.message), summary: "Warning", category: Message.Category.warning)
             }
         }
+        if let nativeSigningFailure = output.firstMatch(of: /Failed to sign Shortcut using macOS :\(\n(?<reason>(.|\n)*?)\n\n/) {
+            hasWarnings = true
+            createMessage(message: "Unable to sign using macOS, the compiler fell back to a signing service.\n\(nativeSigningFailure.reason)",
+                          summary: "Warning",
+                          category: Message.Category.warning)
+        }
         if output.contains("Error:") || output.contains("panic:") {
             hasError = true
             
