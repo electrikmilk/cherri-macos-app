@@ -15,12 +15,12 @@ struct PreviewPane: View {
         if isBuilding || !controller.isReady {
             loading
         } else if let errorMessage = controller.errorMessage {
-            ContentUnavailableView("Unable to show preview",
+            ContentUnavailableView("Unable to preview",
                                    systemImage: "exclamationmark.triangle",
                                    description: Text(errorMessage))
         } else if !hasPreview {
-            ContentUnavailableView("No preview",
-                                   systemImage: "rectangle.on.rectangle",
+            ContentUnavailableView("No build yet",
+                                   systemImage: "hammer",
                                    description: Text("Build the Shortcut to see a preview."))
         } else {
             PreviewWebView(webView: controller.webView)
