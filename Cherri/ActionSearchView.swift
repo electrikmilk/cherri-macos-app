@@ -22,7 +22,6 @@ struct ActionSearchView: View {
     @State private var chipRowWidth: CGFloat = 0
     /// Chip frames inside the scrolling content, so they do not change as the row scrolls.
     @State private var chipFrames: [String: CGRect] = [:]
-    @State private var openedCategoryChipFrame: CGRect?
     @Namespace private var chipNamespace
     @State private var selectedSubcategory: String?
     @State private var selectedIdentifier: String?
@@ -37,10 +36,8 @@ struct ActionSearchView: View {
     private static let chipContentSpace = "chipContent"
     private static let chipRowMargin: CGFloat = 12
 
-    private static let categoryChipIDPrefix = "category:"
-
     private static func chipID(ofCategoryNamed name: String) -> String {
-        "\(categoryChipIDPrefix)\(name)"
+        "category:\(name)"
     }
 
     private static func chipID(ofSubcategory name: String) -> String {
@@ -116,7 +113,8 @@ struct ActionSearchView: View {
                 }
                 .onGeometryChange(for: CGFloat.self) { $0.size.width } action: { chipRowWidth = $0 }
                 .onChange(of: selectedCategoryName) { previousName, newName in
-                    scrollCategoryRow(proxy, fromCategoryNamed: previousName, toCategoryNamed: newName)
+                    guard newName == nil, let previousName else { return }
+                    scrollCategoryRowBack(proxy, fromCategoryNamed: previousName)
                 }
             }
             .animation(.smooth(duration: 0.35), value: selectedCategoryName)
@@ -157,8 +155,8 @@ struct ActionSearchView: View {
                 ScrollView(.horizontal, showsIndicators: false) {
                     glassContainer {
                         HStack(spacing: 6) {
-                            ForEach(category.subcategories.map { (id: Self.chipID(ofSubcategory: $0), name: $0) }, id: \.id) { id, subcategory in
-                                chip(subcategory, id: id, isSelected: selectedSubcategory == subcategory) {
+                            ForEach(category.subcategories, id: \.self) { subcategory in
+                                chip(subcategory, id: Self.chipID(ofSubcategory: subcategory), isSelected: selectedSubcategory == subcategory) {
                                     selectedSubcategory = subcategory
                                 }
                             }
@@ -185,10 +183,15 @@ struct ActionSearchView: View {
     @ViewBuilder
     private func categoryChips(of categories: [CherriActionCategory]) -> some View {
         chip("All", id: Self.allChipID, isSelected: true) {}
-        ForEach(categories.map { (id: Self.chipID(ofCategoryNamed: $0.name), category: $0) }, id: \.id) { id, category in
+        ForEach(categories, id: \.name) { category in
+            let id = Self.chipID(ofCategoryNamed: category.name)
             chip(category.title, id: id, isSelected: false) {
-                openedCategoryChipFrame = chipFrames[id]
                 selectedCategoryName = category.name
+            }
+            .onGeometryChange(for: CGRect.self) { $0.frame(in: .named(Self.chipContentSpace)) } action: { frame in
+                // Writing frames while the chips morph away would update the glass every frame.
+                guard selectedCategoryName == nil else { return }
+                chipFrames[id] = frame
             }
         }
     }
@@ -201,12 +204,12 @@ struct ActionSearchView: View {
     /// further right than that would be clamped to the left. Going back centers the category that was open when it lies
     /// past the first screenful of chips, and otherwise starts at the left.
     /// Scrolling by id with a proxy rather than a bound position, because a bound position ignores a target equal to its current value.
-    private func scrollCategoryRow(_ proxy: ScrollViewProxy, fromCategoryNamed previousName: String?, toCategoryNamed newName: String?) {
-        guard newName == nil else { return }
-        let isPastFirstScreenful = openedCategoryChipFrame.map { $0.maxX + Self.chipRowMargin > chipRowWidth } ?? false
+    private func scrollCategoryRowBack(_ proxy: ScrollViewProxy, fromCategoryNamed previousName: String) {
+        let previousChipID = Self.chipID(ofCategoryNamed: previousName)
+        let isPastFirstScreenful = chipFrames[previousChipID].map { $0.maxX + Self.chipRowMargin > chipRowWidth } ?? false
         withAnimation(.smooth(duration: 0.35)) {
-            if isPastFirstScreenful, let previousName {
-                proxy.scrollTo(Self.chipID(ofCategoryNamed: previousName), anchor: .center)
+            if isPastFirstScreenful {
+                proxy.scrollTo(previousChipID, anchor: .center)
             } else {
                 proxy.scrollTo(Self.rowStartID, anchor: .leading)
             }
@@ -237,45 +240,30 @@ struct ActionSearchView: View {
         .accessibilityLabel("Back")
     }
 
+    /// The id names the chip both for the glass morph and for scrolling the row to it.
     private func chip(_ title: String, id: String, isSelected: Bool, select: @escaping () -> Void) -> some View {
-        chipBody(title, id: id, isSelected: isSelected, select: select)
-            .onGeometryChange(for: CGRect.self) { $0.frame(in: .named(Self.chipContentSpace)) } action: { recordCategoryRowFrame($0, ofChip: id) }
-    }
-
-    /// Only the category row's own layout is wanted, and writing state for chips that move during the morph would update the glass every frame.
-    private func recordCategoryRowFrame(_ frame: CGRect, ofChip id: String) {
-        guard selectedCategoryName == nil, id.hasPrefix(Self.categoryChipIDPrefix) else { return }
-        chipFrames[id] = frame
-    }
-
-    @ViewBuilder
-    private func chipBody(_ title: String, id: String, isSelected: Bool, select: @escaping () -> Void) -> some View {
-        if #available(macOS 26, *) {
-            glassChip(title, id: id, isSelected: isSelected, select: select)
-        } else {
-            Toggle(title, isOn: Binding(get: { isSelected }, set: { _ in select() }))
-                .toggleStyle(.button)
-                .buttonBorderShape(.capsule)
-                .controlSize(.small)
-                .tint(.accentColor)
-                .id(id)
+        Group {
+            if #available(macOS 26, *) {
+                Button(action: select) {
+                    Text(title)
+                        .padding(.horizontal, 14)
+                        .padding(.vertical, 6)
+                        .foregroundStyle(isSelected ? Color.white : Color.primary)
+                        .contentShape(Capsule())
+                }
+                .buttonStyle(.plain)
+                .glassEffect(isSelected ? .regular.tint(.accentColor).interactive() : .regular.interactive(), in: .capsule)
+                .glassEffectID(id, in: chipNamespace)
+                .accessibilityAddTraits(isSelected ? .isSelected : [])
+            } else {
+                Toggle(title, isOn: Binding(get: { isSelected }, set: { _ in select() }))
+                    .toggleStyle(.button)
+                    .buttonBorderShape(.capsule)
+                    .controlSize(.small)
+                    .tint(.accentColor)
+            }
         }
-    }
-
-    @available(macOS 26, *)
-    private func glassChip(_ title: String, id: String, isSelected: Bool, select: @escaping () -> Void) -> some View {
-        Button(action: select) {
-            Text(title)
-                .padding(.horizontal, 14)
-                .padding(.vertical, 6)
-                .foregroundStyle(isSelected ? Color.white : Color.primary)
-                .contentShape(Capsule())
-        }
-        .buttonStyle(.plain)
-        .glassEffect(isSelected ? .regular.tint(.accentColor).interactive() : .regular.interactive(), in: .capsule)
-        .glassEffectID(id, in: chipNamespace)
         .id(id)
-        .accessibilityAddTraits(isSelected ? .isSelected : [])
     }
 
     // MARK: Results
