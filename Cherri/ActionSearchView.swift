@@ -213,11 +213,9 @@ struct ActionSearchView: View {
             Button(action: closeCategory) {
                 Image(systemName: "chevron.left")
                     .fontWeight(.semibold)
-                    .frame(width: 28, height: 28)
-                    .contentShape(Circle())
             }
-            .buttonStyle(.plain)
-            .glassEffect(.regular.interactive(), in: .circle)
+            .buttonStyle(.glass)
+            .buttonBorderShape(.circle)
             .glassEffectID(Self.backButtonID, in: chipNamespace)
             .id(Self.backButtonID)
             .help("Back to \(destination)")
