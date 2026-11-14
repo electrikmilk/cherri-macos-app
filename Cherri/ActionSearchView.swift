@@ -118,8 +118,8 @@ struct ActionSearchView: View {
                     }
                     .scrollTargetLayout()
                 }
-                .padding(.horizontal, 12)
             }
+            .contentMargins(.horizontal, 12, for: .scrollContent)
             .scrollPosition(id: $chipScrollTarget, anchor: .leading)
             .animation(.smooth(duration: 0.35), value: selectedCategoryName)
             .animation(.snappy, value: selectedSubcategory)
