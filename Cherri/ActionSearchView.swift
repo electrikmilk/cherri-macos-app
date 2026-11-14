@@ -8,7 +8,6 @@ import SwiftUI
 /// A quick-open panel that searches every action the compiler documents.
 struct ActionSearchView: View {
     let onInsert: (CherriActionEntry) -> Void
-    let onDismiss: () -> Void
     var loadContents: () async throws -> CherriActionRegistry.Contents = { try await CherriActionRegistry.shared.contents() }
 
     private enum LoadState {
@@ -20,7 +19,6 @@ struct ActionSearchView: View {
     @State private var loadState: LoadState = .loading
     @State private var query = ""
     @State private var selectedCategoryName: String?
-    @State private var searchFieldHeight: CGFloat = 0
     @State private var chipScrollTarget: String?
     /// Where the category row was scrolled to before a category was opened.
     @State private var categoryRowScrollTarget: String?
@@ -40,8 +38,6 @@ struct ActionSearchView: View {
         "category:\(category.name)"
     }
 
-    private static let panelShape = RoundedRectangle(cornerRadius: 12, style: .continuous)
-
     var body: some View {
         VStack(spacing: 0) {
             searchField
@@ -51,14 +47,8 @@ struct ActionSearchView: View {
             content
         }
         .frame(width: 520, height: 420)
-        .background(.background)
-        .clipShape(Self.panelShape)
-        .overlay(Self.panelShape.strokeBorder(.separator))
-        .shadow(radius: 20)
-        .onContinuousHover(perform: setCursor)
         .task { await load() }
         .onAppear { searchFieldIsFocused = true }
-        .onExitCommand(perform: onDismiss)
         .onChange(of: visibleEntries.map(\.id)) { selectedIdentifier = visibleEntries.first?.id }
         .onChange(of: selectedCategoryName) { selectedSubcategory = nil }
     }
@@ -94,14 +84,6 @@ struct ActionSearchView: View {
                 .onKeyPress(.downArrow) { moveSelection(by: 1) }
         }
         .padding(12)
-        .onGeometryChange(for: CGFloat.self) { $0.size.height } action: { searchFieldHeight = $0 }
-    }
-
-    /// One handler decides the cursor for the whole panel, so nothing in it can fall back to the editor's I-beam.
-    private func setCursor(for phase: HoverPhase) {
-        guard case .active(let location) = phase else { return }
-        let cursor: NSCursor = location.y < searchFieldHeight ? .iBeam : .arrow
-        cursor.set()
     }
 
     @ViewBuilder
@@ -351,16 +333,6 @@ struct ActionSearchView: View {
     }
 }
 
-extension View {
-    /// The editor's text view keeps its I-beam cursor under SwiftUI content drawn over it, so the overlay sets the arrow itself.
-    func arrowCursorOnHover() -> some View {
-        onContinuousHover { phase in
-            guard case .active = phase else { return }
-            NSCursor.arrow.set()
-        }
-    }
-}
-
 private struct ActionInfoView: View {
     let entry: CherriActionEntry
 
@@ -393,7 +365,7 @@ private struct ActionInfoView: View {
                           subcategory: subcategory)
     }
 
-    return ActionSearchView(onInsert: { _ in }, onDismiss: {}) {
+    return ActionSearchView(onInsert: { _ in }) {
         CherriActionRegistry.Contents(
             categories: [device, text],
             entries: [

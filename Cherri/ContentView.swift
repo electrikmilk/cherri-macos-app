@@ -133,17 +133,8 @@ struct ContentView: View {
                 }
             }
         }
-        .overlay {
-            if isActionSearchPresented {
-                ZStack(alignment: .top) {
-                    Color.clear
-                        .contentShape(Rectangle())
-                        .onTapGesture(perform: dismissActionSearch)
-                        .arrowCursorOnHover()
-                    ActionSearchView(onInsert: insertAction, onDismiss: dismissActionSearch)
-                        .padding(.top, 40)
-                }
-            }
+        .sheet(isPresented: $isActionSearchPresented, onDismiss: { editorIsFocused = true }) {
+            ActionSearchView(onInsert: insertAction)
         }
         .inspector(isPresented: $showPreview) {
             PreviewPane(controller: previewController, isBuilding: busy, hasPreview: hasPreview)
@@ -160,17 +151,12 @@ struct ContentView: View {
         isActionSearchPresented = true
     }
 
-    private func dismissActionSearch() {
-        isActionSearchPresented = false
-        editorIsFocused = true
-    }
-
     private func insertAction(_ entry: CherriActionEntry) {
         let selection = editPosition.selections.first ?? NSRange(location: document.text.utf16.count, length: 0)
         let result = ActionInsertion.insert(entry, into: document.text, replacing: selection)
         document.text = result.text
         editPosition.selections = [result.selection]
-        dismissActionSearch()
+        isActionSearchPresented = false
     }
 
     /// Without a spacer, macOS 26 merges neighboring toolbar items into a single capsule.
