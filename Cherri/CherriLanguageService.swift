@@ -168,7 +168,7 @@ private struct Candidate {
 
     static func action(_ action: CherriAction) -> Candidate {
         Candidate(name: action.identifier,
-                  insertText: action.takesParameters ? "\(action.identifier)(" : "\(action.identifier)()",
+                  insertText: action.insertionText,
                   detail: action.title,
                   matchesAnywhere: false,
                   documentation: AnyView(ActionDocumentation(action: action)))

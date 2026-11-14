@@ -165,28 +165,33 @@ final class ActionSearchRegistryTests: XCTestCase {
     }
 }
 
+private func makeEntry(_ identifier: String,
+                       title: String = "",
+                       summary: String = "",
+                       takesParameters: Bool = false,
+                       category: CherriActionCategory? = nil) -> CherriActionEntry {
+    let signature = takesParameters ? "\(identifier)(text value)" : "\(identifier)()"
+    return CherriActionEntry(action: CherriAction(identifier: identifier,
+                                                  title: title,
+                                                  summary: summary,
+                                                  definition: signature,
+                                                  signature: signature,
+                                                  notes: []),
+                             category: category,
+                             subcategory: nil)
+}
+
 final class ActionSearchRankerTests: XCTestCase {
-    private let getPDFText = entry("getPDFText", title: "Get PDF Text", summary: "Get text from PDF.")
-    private let askChatGPT = entry("askChatGPT", title: "Ask Chat GPT", summary: "Ask Chat GPT using a prompt.")
-    private let cheatGopherTool = entry("cheatGopherTool", title: "Cheat Gopher Tool", summary: "Unrelated.")
-    private let makeDiskImage = entry("makeDiskImage", title: "Make Disk Image", summary: "Create a new disk image.")
-    private let playNext = entry("playNext", title: "Play Next", summary: "Play next.")
-    private let playLater = entry("playLater", title: "Play Next", summary: "Play later.")
-    private let skipTrack = entry("skipTrack", title: "Skip Track", summary: "Skip to the next track, or play it.")
+    private let getPDFText = makeEntry("getPDFText", title: "Get PDF Text", summary: "Get text from PDF.")
+    private let askChatGPT = makeEntry("askChatGPT", title: "Ask Chat GPT", summary: "Ask Chat GPT using a prompt.")
+    private let cheatGopherTool = makeEntry("cheatGopherTool", title: "Cheat Gopher Tool", summary: "Unrelated.")
+    private let makeDiskImage = makeEntry("makeDiskImage", title: "Make Disk Image", summary: "Create a new disk image.")
+    private let playNext = makeEntry("playNext", title: "Play Next", summary: "Play next.")
+    private let playLater = makeEntry("playLater", title: "Play Next", summary: "Play later.")
+    private let skipTrack = makeEntry("skipTrack", title: "Skip Track", summary: "Skip to the next track, or play it.")
 
     private var allEntries: [CherriActionEntry] {
         [getPDFText, askChatGPT, cheatGopherTool, makeDiskImage, playNext, playLater, skipTrack]
-    }
-
-    private static func entry(_ identifier: String, title: String, summary: String) -> CherriActionEntry {
-        CherriActionEntry(action: CherriAction(identifier: identifier,
-                                               title: title,
-                                               summary: summary,
-                                               definition: "\(identifier)()",
-                                               signature: "\(identifier)()",
-                                               notes: []),
-                          category: nil,
-                          subcategory: nil)
     }
 
     private func rankedIdentifiers(for query: String) -> [String] {
@@ -221,5 +226,105 @@ final class ActionSearchRankerTests: XCTestCase {
     func testEmptyQueryReturnsAllInOriginalOrder() {
         XCTAssertEqual(rankedIdentifiers(for: ""), allEntries.map(\.action.identifier))
         XCTAssertEqual(rankedIdentifiers(for: "   "), allEntries.map(\.action.identifier))
+    }
+}
+
+final class ActionInsertionTests: XCTestCase {
+    private let textCategory = CherriActionCategory(name: "text", includePath: "actions/text", subcategories: [])
+    private let basicCategory = CherriActionCategory(name: "basic", includePath: nil, subcategories: [])
+
+    private var define: CherriActionEntry {
+        makeEntry("define", takesParameters: true, category: textCategory)
+    }
+
+    private func endOfText(_ text: String) -> NSRange {
+        NSRange(location: text.utf16.count, length: 0)
+    }
+
+    func testInsertsActionAndIncludeIntoEmptyText() {
+        let result = ActionInsertion.insert(define, into: "", replacing: NSRange(location: 0, length: 0))
+
+        let expectedText = "#include 'actions/text'\ndefine("
+        XCTAssertEqual(result, ActionInsertionResult(text: expectedText, selection: endOfText(expectedText)))
+    }
+
+    func testIncludeGoesBelowLastExistingInclude() {
+        let text = "#include 'actions/device'\n#define color red\n"
+
+        let result = ActionInsertion.insert(define, into: text, replacing: endOfText(text))
+
+        let expectedText = "#include 'actions/device'\n#include 'actions/text'\n#define color red\ndefine("
+        XCTAssertEqual(result, ActionInsertionResult(text: expectedText, selection: endOfText(expectedText)))
+    }
+
+    func testIncludeAfterLastLineWithoutTrailingNewline() {
+        let text = "x\n#include 'actions/device'"
+
+        let result = ActionInsertion.insert(define, into: text, replacing: NSRange(location: 0, length: 0))
+
+        XCTAssertEqual(result.text, "define(x\n#include 'actions/device'\n#include 'actions/text'\n")
+        XCTAssertEqual(result.selection, NSRange(location: "define(".utf16.count, length: 0))
+    }
+
+    func testExistingIncludeIsNotDuplicated() {
+        for existingInclude in ["#include \"actions/text\"\n", "#include   'actions/text'\n"] {
+            let result = ActionInsertion.insert(define, into: existingInclude, replacing: endOfText(existingInclude))
+
+            XCTAssertEqual(result.text, "\(existingInclude)define(")
+        }
+    }
+
+    func testBasicCategoryAddsNoInclude() {
+        let comment = makeEntry("comment", takesParameters: true, category: basicCategory)
+
+        let result = ActionInsertion.insert(comment, into: "", replacing: NSRange(location: 0, length: 0))
+
+        XCTAssertEqual(result.text, "comment(")
+    }
+
+    func testUncategorizedActionAddsNoInclude() {
+        let rawAction = makeEntry("rawAction", takesParameters: true)
+
+        let result = ActionInsertion.insert(rawAction, into: "", replacing: NSRange(location: 0, length: 0))
+
+        XCTAssertEqual(result.text, "rawAction(")
+    }
+
+    func testActionWithoutParametersInsertsEmptyParentheses() {
+        let lockScreen = makeEntry("lockScreen", category: basicCategory)
+
+        let result = ActionInsertion.insert(lockScreen, into: "", replacing: NSRange(location: 0, length: 0))
+
+        XCTAssertEqual(result, ActionInsertionResult(text: "lockScreen()", selection: NSRange(location: 12, length: 0)))
+    }
+
+    func testSelectionIsReplaced() {
+        let comment = makeEntry("comment", takesParameters: true, category: basicCategory)
+
+        let result = ActionInsertion.insert(comment, into: "x abc y", replacing: NSRange(location: 2, length: 3))
+
+        XCTAssertEqual(result, ActionInsertionResult(text: "x comment( y", selection: NSRange(location: 10, length: 0)))
+    }
+
+    func testCaretAboveIncludesIsNotShifted() {
+        let text = "// notes\n#include 'actions/device'\n"
+
+        let result = ActionInsertion.insert(define, into: text, replacing: NSRange(location: 0, length: 0))
+
+        XCTAssertEqual(result.text, "define(// notes\n#include 'actions/device'\n#include 'actions/text'\n")
+        XCTAssertEqual(result.selection, NSRange(location: "define(".utf16.count, length: 0))
+    }
+
+    func testSelectionOverlappingTheIncludeBlockStillReplacesExactlyTheSelectedText() {
+        let text = "#include 'actions/device'\nbody\n"
+        let selection = NSRange(location: 24, length: 4)
+
+        let result = ActionInsertion.insert(define, into: text, replacing: selection)
+
+        let includeLine = "#include 'actions/text'\n"
+        XCTAssertEqual(result.text.components(separatedBy: includeLine).count - 1, 1)
+        XCTAssertEqual(result.text.replacingOccurrences(of: includeLine, with: ""),
+                       (text as NSString).replacingCharacters(in: selection, with: "define("))
+        XCTAssertTrue((result.text as NSString).substring(to: result.selection.location).hasSuffix("define("))
     }
 }

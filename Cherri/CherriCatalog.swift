@@ -17,6 +17,10 @@ struct CherriAction: Sendable {
     var takesParameters: Bool {
         !signature.dropFirst(identifier.count).hasPrefix("()")
     }
+
+    var insertionText: String {
+        takesParameters ? "\(identifier)(" : "\(identifier)()"
+    }
 }
 
 enum CherriCatalogError: LocalizedError {
