@@ -132,10 +132,10 @@ struct ContentView: View {
                     Color.clear
                         .contentShape(Rectangle())
                         .onTapGesture(perform: dismissActionSearch)
+                        .arrowCursorOnHover()
                     ActionSearchView(onInsert: insertAction, onDismiss: dismissActionSearch)
                         .padding(.top, 40)
                 }
-                .background(ArrowCursorArea())
             }
         }
         .inspector(isPresented: $showPreview) {

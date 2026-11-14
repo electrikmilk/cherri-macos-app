@@ -35,8 +35,10 @@ struct ActionSearchView: View {
             searchField
             Divider()
             categoryBar
+                .arrowCursorOnHover()
             Divider()
             content
+                .arrowCursorOnHover()
         }
         .frame(width: 520, height: 420)
         .background(.background)
@@ -279,20 +281,13 @@ struct ActionSearchView: View {
     }
 }
 
-/// The editor's text view keeps its I-beam cursor rect under SwiftUI content drawn over it, so the overlay claims the area.
-struct ArrowCursorArea: NSViewRepresentable {
-    private final class ArrowCursorView: NSView {
-        override func resetCursorRects() {
-            addCursorRect(bounds, cursor: .arrow)
+extension View {
+    /// The editor's text view keeps its I-beam cursor under SwiftUI content drawn over it, so the overlay sets the arrow itself.
+    func arrowCursorOnHover() -> some View {
+        onContinuousHover { phase in
+            guard case .active = phase else { return }
+            NSCursor.arrow.set()
         }
-    }
-
-    func makeNSView(context: Context) -> NSView {
-        ArrowCursorView()
-    }
-
-    func updateNSView(_ nsView: NSView, context: Context) {
-        nsView.window?.invalidateCursorRects(for: nsView)
     }
 }
 
