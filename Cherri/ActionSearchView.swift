@@ -25,14 +25,20 @@ struct ActionSearchView: View {
     @State private var identifierShowingInfo: String?
     @FocusState private var searchFieldIsFocused: Bool
 
+    private static let panelShape = RoundedRectangle(cornerRadius: 12, style: .continuous)
+
     var body: some View {
         VStack(spacing: 0) {
-            searchHeader
+            searchField
+            Divider()
+            categoryBar
             Divider()
             content
         }
         .frame(width: 520, height: 420)
-        .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 12))
+        .background(.regularMaterial)
+        .clipShape(Self.panelShape)
+        .overlay(Self.panelShape.strokeBorder(.separator))
         .shadow(radius: 20)
         .task { await load() }
         .onAppear { searchFieldIsFocused = true }
@@ -63,7 +69,7 @@ struct ActionSearchView: View {
 
     // MARK: Header
 
-    private var searchHeader: some View {
+    private var searchField: some View {
         HStack(spacing: 8) {
             Image(systemName: "magnifyingglass")
                 .foregroundStyle(.secondary)
@@ -74,33 +80,54 @@ struct ActionSearchView: View {
                 .onSubmit(insertSelectedEntry)
                 .onKeyPress(.upArrow) { moveSelection(by: -1) }
                 .onKeyPress(.downArrow) { moveSelection(by: 1) }
-            categoryPickers
         }
         .padding(12)
     }
 
     @ViewBuilder
-    private var categoryPickers: some View {
+    private var categoryBar: some View {
         if let contents {
-            Picker("Category", selection: $selectedCategoryName) {
-                Text("All").tag(String?.none)
-                ForEach(contents.categories, id: \.name) { category in
-                    Text(category.name).tag(Optional(category.name))
+            HStack(spacing: 8) {
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 6) {
+                        categoryChip("All", isSelected: selectedCategoryName == nil) {
+                            selectedCategoryName = nil
+                        }
+                        ForEach(contents.categories, id: \.name) { category in
+                            categoryChip(category.title, isSelected: selectedCategoryName == category.name) {
+                                selectedCategoryName = category.name
+                            }
+                        }
+                    }
+                    .padding(.horizontal, 12)
+                }
+                subcategoryMenu
+                    .padding(.trailing, 12)
+            }
+            .padding(.vertical, 8)
+        }
+    }
+
+    private func categoryChip(_ title: String, isSelected: Bool, select: @escaping () -> Void) -> some View {
+        Toggle(title, isOn: Binding(get: { isSelected }, set: { _ in select() }))
+            .toggleStyle(.button)
+            .buttonBorderShape(.capsule)
+            .controlSize(.small)
+            .tint(.accentColor)
+    }
+
+    @ViewBuilder
+    private var subcategoryMenu: some View {
+        if !subcategoriesOfSelectedCategory.isEmpty {
+            Picker("Subcategory", selection: $selectedSubcategory) {
+                Text("All subcategories").tag(String?.none)
+                ForEach(subcategoriesOfSelectedCategory, id: \.self) { subcategory in
+                    Text(subcategory).tag(Optional(subcategory))
                 }
             }
             .labelsHidden()
+            .controlSize(.small)
             .fixedSize()
-
-            if !subcategoriesOfSelectedCategory.isEmpty {
-                Picker("Subcategory", selection: $selectedSubcategory) {
-                    Text("All").tag(String?.none)
-                    ForEach(subcategoriesOfSelectedCategory, id: \.self) { subcategory in
-                        Text(subcategory).tag(Optional(subcategory))
-                    }
-                }
-                .labelsHidden()
-                .fixedSize()
-            }
         }
     }
 
@@ -126,6 +153,8 @@ struct ActionSearchView: View {
             List(visibleEntries, selection: $selectedIdentifier) { entry in
                 row(for: entry)
             }
+            .listStyle(.inset)
+            .scrollContentBackground(.hidden)
             .contextMenu(forSelectionType: String.self) { _ in
             } primaryAction: { _ in
                 insertSelectedEntry()
@@ -216,8 +245,8 @@ private struct ActionInfoView: View {
 }
 
 #Preview {
-    let device = CherriActionCategory(name: "device", includePath: "actions/device", subcategories: ["Battery", "Display"])
-    let text = CherriActionCategory(name: "text", includePath: "actions/text", subcategories: [])
+    let device = CherriActionCategory(name: "device", title: "Device", includePath: "actions/device", subcategories: ["Battery", "Display"])
+    let text = CherriActionCategory(name: "text", title: "Text", includePath: "actions/text", subcategories: [])
 
     func entry(_ identifier: String, _ title: String, _ summary: String, category: CherriActionCategory?, subcategory: String? = nil) -> CherriActionEntry {
         CherriActionEntry(action: CherriAction(identifier: identifier,

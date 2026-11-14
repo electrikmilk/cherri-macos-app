@@ -112,11 +112,20 @@ final class ActionSearchDocsParserTests: XCTestCase {
         let parsed = try CherriDocsParser.entries(fromDocs: deviceDocs, category: "device")
 
         XCTAssertEqual(parsed.category, CherriActionCategory(name: "device",
+                                                             title: "Device",
                                                              includePath: "actions/device",
                                                              subcategories: ["Battery", "Display"]))
         XCTAssertEqual(parsed.entries.map(\.action.identifier), ["setChargeLimit", "lockScreen"])
         XCTAssertEqual(parsed.entries.map(\.subcategory), ["Battery", "Display"])
         XCTAssertEqual(parsed.entries.map(\.category), [parsed.category, parsed.category])
+    }
+
+    func testCategoryTitleIsTheDocsHeadingWithoutTheActionsSuffix() throws {
+        let docs = "# Apple Intelligence Actions\n\n### Comment\n\nAdd an explicit comment.\n\n```\ncomment(text comment)\n```\n"
+
+        let parsed = try CherriDocsParser.entries(fromDocs: docs, category: "intelligence")
+
+        XCTAssertEqual(parsed.category.title, "Apple Intelligence")
     }
 
     func testBasicDocsHaveNoIncludePath() throws {
@@ -236,8 +245,8 @@ final class ActionSearchRankerTests: XCTestCase {
 }
 
 final class ActionInsertionTests: XCTestCase {
-    private let textCategory = CherriActionCategory(name: "text", includePath: "actions/text", subcategories: [])
-    private let basicCategory = CherriActionCategory(name: "basic", includePath: nil, subcategories: [])
+    private let textCategory = CherriActionCategory(name: "text", title: "Text", includePath: "actions/text", subcategories: [])
+    private let basicCategory = CherriActionCategory(name: "basic", title: "Basic", includePath: nil, subcategories: [])
 
     private var define: CherriActionEntry {
         makeEntry("define", takesParameters: true, category: textCategory)

@@ -6,7 +6,10 @@
 import Foundation
 
 struct CherriActionCategory: Sendable, Equatable {
+    /// The name `--docs=` takes.
     let name: String
+    /// The name for people, from the documentation heading.
+    let title: String
     /// `nil` for categories the compiler includes automatically.
     let includePath: String?
     let subcategories: [String]
@@ -41,6 +44,7 @@ enum CherriDocsParser {
     private static let includePathRegex = /#include '(?<path>[^']+)'/
     private static let codeFence = "```"
     private static let categoryHeadingPrefix = "# "
+    private static let categoryHeadingSuffix = " Actions"
     private static let subcategoryHeadingPrefix = "## "
     private static let actionHeadingPrefix = "### "
 
@@ -55,9 +59,10 @@ enum CherriDocsParser {
 
     static func entries(fromDocs docs: String, category name: String) throws -> (category: CherriActionCategory, entries: [CherriActionEntry]) {
         let lines = docs.components(separatedBy: "\n")
-        guard lines.first?.hasPrefix(categoryHeadingPrefix) == true else {
+        guard let heading = lines.first, heading.hasPrefix(categoryHeadingPrefix) else {
             throw CherriActionRegistryError.missingCategoryHeading(category: name)
         }
+        let title = heading.dropFirst(categoryHeadingPrefix.count).removingSuffix(categoryHeadingSuffix)
 
         var includePath: String?
         var subcategories: [String] = []
@@ -88,13 +93,19 @@ enum CherriDocsParser {
             }
         }
 
-        let category = CherriActionCategory(name: name, includePath: includePath, subcategories: subcategories)
+        let category = CherriActionCategory(name: name, title: title, includePath: includePath, subcategories: subcategories)
         let entries = try blocks.map { block in
             CherriActionEntry(action: try CherriCatalogParser.action(from: block.lines.joined(separator: "\n")),
                               category: category,
                               subcategory: block.subcategory)
         }
         return (category, entries)
+    }
+}
+
+private extension Substring {
+    func removingSuffix(_ suffix: String) -> String {
+        hasSuffix(suffix) ? String(dropLast(suffix.count)) : String(self)
     }
 }
 
