@@ -17,6 +17,7 @@
 		72213BA82B1D159E00590D99 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 72213BA72B1D159E00590D99 /* Assets.xcassets */; };
 		72213BAB2B1D159E00590D99 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 72213BAA2B1D159E00590D99 /* Preview Assets.xcassets */; };
 		72213BB72B1D159E00590D99 /* CherriTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72213BB62B1D159E00590D99 /* CherriTests.swift */; };
+		7230F0C2F6177E749A9DB02B /* ActionSearchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7230F0C2B70AD41FB612F397 /* ActionSearchTests.swift */; };
 		72213BC12B1D159E00590D99 /* CherriUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72213BC02B1D159E00590D99 /* CherriUITests.swift */; };
 		72213BC32B1D159E00590D99 /* CherriUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72213BC22B1D159E00590D99 /* CherriUITestsLaunchTests.swift */; };
 		72213BD12B1D17BE00590D99 /* CodeEditorView in Frameworks */ = {isa = PBXBuildFile; productRef = 72213BD02B1D17BE00590D99 /* CodeEditorView */; };
@@ -29,6 +30,7 @@
 		7230F0B82F2C000100AB0001 /* PreviewPane.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7230F0B72F2C000100AB0001 /* PreviewPane.swift */; };
 		7230F0BA2F2C000100AB0001 /* ProcessRunner.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7230F0B92F2C000100AB0001 /* ProcessRunner.swift */; };
 		7230F0C10000000000AB0002 /* CherriCatalog.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7230F0C10000000000AB0001 /* CherriCatalog.swift */; };
+		7230F0C20549AC6CA14A8AEC /* CherriActionRegistry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7230F0C2436D0042A073935D /* CherriActionRegistry.swift */; };
 		7230F0C20000000000AB0002 /* CherriCompletionContext.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7230F0C20000000000AB0001 /* CherriCompletionContext.swift */; };
 		7230F0C30000000000AB0002 /* CherriLanguageService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7230F0C30000000000AB0001 /* CherriLanguageService.swift */; };
 		72D4674F2B578C9A00547002 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72D4674E2B578C9A00547002 /* AppDelegate.swift */; };
@@ -70,6 +72,7 @@
 		72213BAD2B1D159E00590D99 /* Cherri.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Cherri.entitlements; sourceTree = "<group>"; };
 		72213BB22B1D159E00590D99 /* CherriTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CherriTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		72213BB62B1D159E00590D99 /* CherriTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CherriTests.swift; sourceTree = "<group>"; };
+		7230F0C2B70AD41FB612F397 /* ActionSearchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActionSearchTests.swift; sourceTree = "<group>"; };
 		72213BBC2B1D159E00590D99 /* CherriUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CherriUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		72213BC02B1D159E00590D99 /* CherriUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CherriUITests.swift; sourceTree = "<group>"; };
 		72213BC22B1D159E00590D99 /* CherriUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CherriUITestsLaunchTests.swift; sourceTree = "<group>"; };
@@ -80,6 +83,7 @@
 		7230F0B72F2C000100AB0001 /* PreviewPane.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreviewPane.swift; sourceTree = "<group>"; };
 		7230F0B92F2C000100AB0001 /* ProcessRunner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProcessRunner.swift; sourceTree = "<group>"; };
 		7230F0C10000000000AB0001 /* CherriCatalog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CherriCatalog.swift; sourceTree = "<group>"; };
+		7230F0C2436D0042A073935D /* CherriActionRegistry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CherriActionRegistry.swift; sourceTree = "<group>"; };
 		7230F0C20000000000AB0001 /* CherriCompletionContext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CherriCompletionContext.swift; sourceTree = "<group>"; };
 		7230F0C30000000000AB0001 /* CherriLanguageService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CherriLanguageService.swift; sourceTree = "<group>"; };
 		724298CB2E89844900BF5234 /* CherriAppIcon.icon */ = {isa = PBXFileReference; lastKnownFileType = folder.iconcomposer.icon; path = CherriAppIcon.icon; sourceTree = "<group>"; };
@@ -147,6 +151,7 @@
 				72213BD42B1D24EB00590D99 /* cherri_binary */,
 				7230F0B92F2C000100AB0001 /* ProcessRunner.swift */,
 				7230F0C10000000000AB0001 /* CherriCatalog.swift */,
+				7230F0C2436D0042A073935D /* CherriActionRegistry.swift */,
 				7230F0C20000000000AB0001 /* CherriCompletionContext.swift */,
 				7230F0C30000000000AB0001 /* CherriLanguageService.swift */,
 				7230F0B72F2C000100AB0001 /* PreviewPane.swift */,
@@ -182,6 +187,7 @@
 			isa = PBXGroup;
 			children = (
 				72213BB62B1D159E00590D99 /* CherriTests.swift */,
+				7230F0C2B70AD41FB612F397 /* ActionSearchTests.swift */,
 			);
 			path = CherriTests;
 			sourceTree = "<group>";
@@ -364,6 +370,7 @@
 				72D4674F2B578C9A00547002 /* AppDelegate.swift in Sources */,
 				7230F0BA2F2C000100AB0001 /* ProcessRunner.swift in Sources */,
 				7230F0C10000000000AB0002 /* CherriCatalog.swift in Sources */,
+				7230F0C20549AC6CA14A8AEC /* CherriActionRegistry.swift in Sources */,
 				7230F0C20000000000AB0002 /* CherriCompletionContext.swift in Sources */,
 				7230F0C30000000000AB0002 /* CherriLanguageService.swift in Sources */,
 				7230F0B82F2C000100AB0001 /* PreviewPane.swift in Sources */,
@@ -385,6 +392,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				72213BB72B1D159E00590D99 /* CherriTests.swift in Sources */,
+				7230F0C2F6177E749A9DB02B /* ActionSearchTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

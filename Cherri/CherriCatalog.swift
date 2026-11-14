@@ -63,7 +63,7 @@ enum CherriCatalogParser {
         return glyphs
     }
 
-    private static func action(from block: String) throws -> CherriAction {
+    static func action(from block: String) throws -> CherriAction {
         let lines = block.components(separatedBy: "\n")
         guard let titleIndex = lines.firstIndex(where: { $0.hasPrefix(titlePrefix) }),
               let fenceStart = lines.firstIndex(of: codeFence),
