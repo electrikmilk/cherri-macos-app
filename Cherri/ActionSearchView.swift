@@ -156,7 +156,7 @@ struct ActionSearchView: View {
                 .toggleStyle(.button)
                 .buttonBorderShape(.capsule)
                 .controlSize(.small)
-                .tint(.red)
+                .tint(.accentColor)
         }
     }
 
@@ -169,7 +169,7 @@ struct ActionSearchView: View {
                 .foregroundStyle(isSelected ? Color.white : Color.primary)
         }
         .buttonStyle(.plain)
-        .glassEffect(isSelected ? .regular.tint(.red).interactive() : .regular.interactive(), in: .capsule)
+        .glassEffect(isSelected ? .regular.tint(.accentColor).interactive() : .regular.interactive(), in: .capsule)
         .accessibilityAddTraits(isSelected ? .isSelected : [])
     }
 
