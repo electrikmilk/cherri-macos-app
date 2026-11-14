@@ -33,7 +33,6 @@ struct ActionSearchView: View {
     private var windowIsActive: Bool { controlActiveState != .inactive }
 
     private static let allChipID = "all"
-    private static let backButtonID = "back"
     private static let rowStartID = "rowStart"
     private static let chipContentSpace = "chipContent"
     private static let chipRowMargin: CGFloat = 12
@@ -60,11 +59,7 @@ struct ActionSearchView: View {
         .task { await load() }
         .onAppear { searchFieldIsFocused = true }
         .onChange(of: visibleEntries.map(\.id)) { selectedIdentifier = visibleEntries.first?.id }
-        .onChange(of: selectedCategoryName) {
-            selectedSubcategory = nil
-            // The chip that was clicked is replaced, and the window can be left with a first responder that no longer exists.
-            searchFieldIsFocused = true
-        }
+        .onChange(of: selectedCategoryName) { selectedSubcategory = nil }
     }
 
     private var contents: CherriActionRegistry.Contents? {
@@ -103,12 +98,20 @@ struct ActionSearchView: View {
     @ViewBuilder
     private var categoryBar: some View {
         if let contents {
+            let selectedCategory = contents.categories.first { $0.name == selectedCategoryName }
             ScrollViewReader { proxy in
-                glassContainer {
-                    if let selectedCategory = contents.categories.first(where: { $0.name == selectedCategoryName }) {
-                        subcategoryBar(for: selectedCategory)
-                    } else {
-                        categoryRow(contents.categories)
+                HStack(spacing: 0) {
+                    if let selectedCategory {
+                        backButton(to: "all categories from \(selectedCategory.title)")
+                            .padding(.leading, Self.chipRowMargin)
+                            .padding(.trailing, 6)
+                    }
+                    glassContainer {
+                        if let selectedCategory {
+                            subcategoryBar(for: selectedCategory)
+                        } else {
+                            categoryRow(contents.categories)
+                        }
                     }
                 }
                 .onGeometryChange(for: CGFloat.self) { $0.size.width } action: { chipRowWidth = $0 }
@@ -135,12 +138,11 @@ struct ActionSearchView: View {
         }
     }
 
-    /// The back button and the chip for the whole category stay put, and only the subcategories scroll. Glass is drawn per
-    /// container, so the scrolling chips get a container of their own inside the scroll view, where the scroll view clips them.
+    /// The chip for the whole category stays put, and only the subcategories scroll. Glass is drawn per container, so the
+    /// scrolling chips get a container of their own inside the scroll view, where the scroll view clips them.
     private func subcategoryBar(for category: CherriActionCategory) -> some View {
         HStack(spacing: 0) {
             HStack(spacing: 6) {
-                backButton(to: "all categories from \(category.title)")
                 chip(category.title, id: Self.chipID(ofCategoryNamed: category.name), isSelected: selectedSubcategory == nil) {
                     selectedSubcategory = nil
                 }
@@ -149,7 +151,6 @@ struct ActionSearchView: View {
                         .frame(height: 16)
                 }
             }
-            .padding(.leading, Self.chipRowMargin)
             .padding(.trailing, 6)
             .zIndex(1)
             if !category.subcategories.isEmpty {
@@ -212,28 +213,28 @@ struct ActionSearchView: View {
         }
     }
 
-    @ViewBuilder
+    /// Kept outside the chips' glass container and out of the morph. Inside it, the back button sometimes stopped taking
+    /// clicks after opening a category from a scrolled row until the window was refocused.
     private func backButton(to destination: String) -> some View {
-        if #available(macOS 26, *) {
-            Button(action: closeCategory) {
-                Image(systemName: "chevron.left")
-                    .fontWeight(.semibold)
+        Group {
+            if #available(macOS 26, *) {
+                Button(action: closeCategory) {
+                    Image(systemName: "chevron.left")
+                        .fontWeight(.semibold)
+                        .frame(width: 28, height: 28)
+                        .contentShape(Circle())
+                }
+                .buttonStyle(.plain)
+                .glassEffect(.regular.interactive(), in: .circle)
+            } else {
+                Button(action: closeCategory) {
+                    Image(systemName: "chevron.left")
+                }
+                .buttonStyle(.borderless)
             }
-            .buttonStyle(.glass)
-            .buttonBorderShape(.circle)
-            .glassEffectID(Self.backButtonID, in: chipNamespace)
-            .id(Self.backButtonID)
-            .help("Back to \(destination)")
-            .accessibilityLabel("Back")
-        } else {
-            Button(action: closeCategory) {
-                Image(systemName: "chevron.left")
-            }
-            .buttonStyle(.borderless)
-            .id(Self.backButtonID)
-            .help("Back to \(destination)")
-            .accessibilityLabel("Back")
         }
+        .help("Back to \(destination)")
+        .accessibilityLabel("Back")
     }
 
     private func chip(_ title: String, id: String, isSelected: Bool, select: @escaping () -> Void) -> some View {
