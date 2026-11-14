@@ -25,6 +25,8 @@ struct ActionSearchView: View {
     @Namespace private var chipNamespace
     @State private var selectedSubcategory: String?
     @State private var selectedIdentifier: String?
+    /// Ranking runs when the filter changes rather than on every redraw.
+    @State private var visibleEntries: [CherriActionEntry] = []
     @State private var identifierShowingInfo: String?
     @FocusState private var searchFieldIsFocused: Bool
     @Environment(\.controlActiveState) private var controlActiveState
@@ -55,7 +57,7 @@ struct ActionSearchView: View {
         .frame(width: 520, height: 420)
         .task { await load() }
         .onAppear { searchFieldIsFocused = true }
-        .onChange(of: visibleEntries.map(\.id)) { selectedIdentifier = visibleEntries.first?.id }
+        .onChange(of: entryFilter) { refreshVisibleEntries() }
         .onChange(of: selectedCategoryName) { selectedSubcategory = nil }
     }
 
@@ -64,7 +66,24 @@ struct ActionSearchView: View {
         return contents
     }
 
-    private var visibleEntries: [CherriActionEntry] {
+    private struct EntryFilter: Equatable {
+        let query: String
+        let categoryName: String?
+        let subcategory: String?
+    }
+
+    private var entryFilter: EntryFilter {
+        EntryFilter(query: query, categoryName: selectedCategoryName, subcategory: selectedSubcategory)
+    }
+
+    private func refreshVisibleEntries() {
+        let previousIdentifiers = visibleEntries.map(\.id)
+        visibleEntries = rankedEntries()
+        guard visibleEntries.map(\.id) != previousIdentifiers else { return }
+        selectedIdentifier = visibleEntries.first?.id
+    }
+
+    private func rankedEntries() -> [CherriActionEntry] {
         guard let contents else { return [] }
         let entriesInSelectedCategory = contents.entries.filter { entry in
             guard let selectedCategoryName else { return true }
@@ -366,6 +385,7 @@ struct ActionSearchView: View {
     private func load() async {
         do {
             loadState = .loaded(try await loadContents())
+            refreshVisibleEntries()
         } catch {
             loadState = .failed(error.localizedDescription)
         }
