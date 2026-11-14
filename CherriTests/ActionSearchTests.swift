@@ -315,6 +315,16 @@ final class ActionInsertionTests: XCTestCase {
         XCTAssertEqual(result.selection, NSRange(location: "define(".utf16.count, length: 0))
     }
 
+    func testSelectionBeyondTheTextIsClampedToTheText() {
+        let comment = makeEntry("comment", takesParameters: true, category: basicCategory)
+
+        let result = ActionInsertion.insert(comment, into: "abc", replacing: NSRange(location: 10, length: 5))
+        let overlongResult = ActionInsertion.insert(comment, into: "abc", replacing: NSRange(location: 1, length: 50))
+
+        XCTAssertEqual(result, ActionInsertionResult(text: "abccomment(", selection: NSRange(location: 11, length: 0)))
+        XCTAssertEqual(overlongResult, ActionInsertionResult(text: "acomment(", selection: NSRange(location: 9, length: 0)))
+    }
+
     func testSelectionOverlappingTheIncludeBlockStillReplacesExactlyTheSelectedText() {
         let text = "#include 'actions/device'\nbody\n"
         let selection = NSRange(location: 24, length: 4)

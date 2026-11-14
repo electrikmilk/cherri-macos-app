@@ -24,7 +24,8 @@ enum ActionInsertion {
 
     /// The selection is replaced first, then the include goes below the last `#include` line of the resulting text.
     /// That keeps the selected characters exactly replaced even when the selection overlaps the include lines.
-    static func insert(_ entry: CherriActionEntry, into text: String, replacing selection: NSRange) -> ActionInsertionResult {
+    static func insert(_ entry: CherriActionEntry, into text: String, replacing requestedSelection: NSRange) -> ActionInsertionResult {
+        let selection = clamped(requestedSelection, toLength: text.utf16.count)
         let actionText = entry.action.insertionText
         let replacedText = (text as NSString).replacingCharacters(in: selection, with: actionText)
         let actionStart = selection.location
@@ -40,6 +41,12 @@ enum ActionInsertion {
                                                                              with: includeText)
         let shiftedCaretOffset = includeBlock.endOffset <= actionStart ? caretOffset + includeText.utf16.count : caretOffset
         return ActionInsertionResult(text: textWithInclude, selection: NSRange(location: shiftedCaretOffset, length: 0))
+    }
+
+    /// The editor's saved selection can be stale, and a range outside the text would crash the replacement.
+    private static func clamped(_ range: NSRange, toLength length: Int) -> NSRange {
+        let location = min(range.location, length)
+        return NSRange(location: location, length: min(range.length, length - location))
     }
 
     private static func includeBlock(in text: String) -> IncludeBlock {
