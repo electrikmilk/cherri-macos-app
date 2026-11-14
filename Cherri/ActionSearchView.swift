@@ -129,16 +129,24 @@ struct ActionSearchView: View {
         }
     }
 
-    /// The back button and the chip for the whole category stay put, and only the subcategories scroll.
+    /// The back button and the chip for the whole category stay put, and only the subcategories scroll beneath them.
     private func subcategoryBar(for category: CherriActionCategory) -> some View {
-        HStack(spacing: 6) {
-            backButton(to: "all categories from \(category.title)")
-            chip(category.title, id: Self.chipID(ofCategoryNamed: category.name), isSelected: selectedSubcategory == nil) {
-                selectedSubcategory = nil
+        HStack(spacing: 0) {
+            HStack(spacing: 6) {
+                backButton(to: "all categories from \(category.title)")
+                chip(category.title, id: Self.chipID(ofCategoryNamed: category.name), isSelected: selectedSubcategory == nil) {
+                    selectedSubcategory = nil
+                }
+                if !category.subcategories.isEmpty {
+                    Divider()
+                        .frame(height: 16)
+                }
             }
+            .padding(.leading, Self.chipRowMargin)
+            .padding(.trailing, 6)
+            .background(.background)
+            .zIndex(1)
             if !category.subcategories.isEmpty {
-                Divider()
-                    .frame(height: 16)
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack(spacing: 6) {
                         ForEach(category.subcategories.map { (id: Self.chipID(ofSubcategory: $0), name: $0) }, id: \.id) { id, subcategory in
@@ -149,9 +157,9 @@ struct ActionSearchView: View {
                     }
                     .padding(.trailing, Self.chipRowMargin)
                 }
+                .clipped()
             }
         }
-        .padding(.leading, Self.chipRowMargin)
         .frame(maxWidth: .infinity, alignment: .leading)
     }
 
