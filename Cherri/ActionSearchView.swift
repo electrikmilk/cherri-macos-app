@@ -203,15 +203,18 @@ struct ActionSearchView: View {
 
     private var resultsList: some View {
         ScrollViewReader { proxy in
-            List(visibleEntries, selection: $selectedIdentifier) { entry in
+            List(visibleEntries) { entry in
                 row(for: entry)
+                    .listRowBackground(selectionBackground(isSelected: entry.id == selectedIdentifier))
+                    .contentShape(Rectangle())
+                    .onTapGesture(count: 2) {
+                        selectedIdentifier = entry.id
+                        insertSelectedEntry()
+                    }
+                    .onTapGesture { selectedIdentifier = entry.id }
             }
-            .listStyle(.inset)
+            .listStyle(.plain)
             .scrollContentBackground(.hidden)
-            .contextMenu(forSelectionType: String.self) { _ in
-            } primaryAction: { _ in
-                insertSelectedEntry()
-            }
             .overlay {
                 if visibleEntries.isEmpty {
                     ContentUnavailableView.search(text: query)
@@ -224,14 +227,26 @@ struct ActionSearchView: View {
         }
     }
 
+    /// The list's own selection turns gray while the search field has focus, so the selection is drawn here.
+    @ViewBuilder
+    private func selectionBackground(isSelected: Bool) -> some View {
+        if isSelected {
+            RoundedRectangle(cornerRadius: 6, style: .continuous)
+                .fill(Color.accentColor)
+                .padding(.horizontal, 6)
+        }
+    }
+
     private func row(for entry: CherriActionEntry) -> some View {
-        HStack {
+        let isSelected = entry.id == selectedIdentifier
+        return HStack {
             VStack(alignment: .leading, spacing: 2) {
                 Text(entry.action.identifier)
                     .font(.body.monospaced())
+                    .foregroundStyle(isSelected ? Color.white : Color.primary)
                 Text(entry.action.summary.isEmpty ? entry.action.title : entry.action.summary)
                     .font(.callout)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(isSelected ? Color.white.opacity(0.8) : Color.secondary)
                     .lineLimit(1)
             }
             Spacer()
@@ -241,8 +256,8 @@ struct ActionSearchView: View {
                 Image(systemName: "info.circle")
             }
             .buttonStyle(.borderless)
-            .tint(entry.id == selectedIdentifier ? .white : .accentColor)
-            .keyboardShortcut(entry.id == selectedIdentifier ? KeyboardShortcut("i", modifiers: .command) : nil)
+            .tint(isSelected ? .white : .accentColor)
+            .keyboardShortcut(isSelected ? KeyboardShortcut("i", modifiers: .command) : nil)
             .help("Show details")
             .accessibilityLabel("Details for \(entry.action.identifier)")
             .popover(isPresented: isShowingInfo(for: entry), arrowEdge: .trailing) {
