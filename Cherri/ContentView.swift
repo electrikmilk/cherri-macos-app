@@ -60,18 +60,20 @@ struct ContentView: View {
     var body: some View {
         VStack {
             NavigationStack {
-                if hasError {
-                    compileErrorBanner
+                VStack(spacing: 0) {
+                    if hasError {
+                        compileErrorBanner
+                    }
+
+                    CodeEditor(text: $document.text,
+                               position: $editPosition,
+                               messages: $messages,
+                               language: .cherri(languageService: languageService))
+                    .environment(\.codeEditorTheme, theme.editorTheme)
+                    .environment(\.codeEditorLayoutConfiguration,
+                                 CodeEditor.LayoutConfiguration(showMinimap: showMinimap, wrapText: wrapText))
+                    .focused($editorIsFocused)
                 }
-                
-                CodeEditor(text: $document.text,
-                           position: $editPosition,
-                           messages: $messages,
-                           language: .cherri(languageService: languageService))
-                .environment(\.codeEditorTheme, theme.editorTheme)
-                .environment(\.codeEditorLayoutConfiguration,
-                             CodeEditor.LayoutConfiguration(showMinimap: showMinimap, wrapText: wrapText))
-                .focused($editorIsFocused)
             }.toolbar {
                 if !busy && (hasError || hasWarnings || compiled) {
                     ToolbarItemGroup {
@@ -149,7 +151,7 @@ struct ContentView: View {
     }
 
     /// Uses the colors of the editor's inline error popups: the error red at 30% over black or white, with a 50% icon block.
-    /// The backgrounds stay inside the safe area, otherwise they paint under the window toolbar.
+    /// The backgrounds stay inside the safe area, and the top gap clears the toolbar buttons, which hang below it.
     private var compileErrorBanner: some View {
         let errorRed = Color(nsColor: .red)
         let isDarkTheme = theme == .dark
@@ -178,6 +180,7 @@ struct ContentView: View {
         .fixedSize(horizontal: false, vertical: true)
         .background(isDarkTheme ? Color.black : Color.white, ignoresSafeAreaEdges: [])
         .foregroundStyle(isDarkTheme ? Color.white : Color.black)
+        .padding(.top, 12)
     }
 
     private func missingIncludeFix(_ includePath: String) -> some View {
