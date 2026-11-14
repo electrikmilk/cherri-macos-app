@@ -392,7 +392,10 @@ struct ActionSearchView: View {
     private func moveSelection(by offset: Int) -> KeyPress.Result {
         let identifiers = visibleEntries.map(\.id)
         guard !identifiers.isEmpty else { return .handled }
-        let currentIndex = selectedIdentifier.flatMap(identifiers.firstIndex(of:)) ?? 0
+        guard let currentIndex = selectedIdentifier.flatMap(identifiers.firstIndex(of:)) else {
+            selectedIdentifier = identifiers.first
+            return .handled
+        }
         selectedIdentifier = identifiers[min(max(currentIndex + offset, 0), identifiers.count - 1)]
         return .handled
     }
