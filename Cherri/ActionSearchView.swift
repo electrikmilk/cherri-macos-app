@@ -19,8 +19,6 @@ struct ActionSearchView: View {
     @State private var loadState: LoadState = .loading
     @State private var query = ""
     @State private var selectedCategoryName: String?
-    @State private var chipScrollTarget: String?
-    @State private var chipScrollAnchor: UnitPoint = .leading
     @State private var chipRowWidth: CGFloat = 0
     /// Chip frames inside the scrolling content, so they do not change as the row scrolls.
     @State private var chipFrames: [String: CGRect] = [:]
@@ -36,6 +34,7 @@ struct ActionSearchView: View {
 
     private static let allChipID = "all"
     private static let backButtonID = "back"
+    private static let rowStartID = "rowStart"
     private static let chipContentSpace = "chipContent"
     private static let chipRowMargin: CGFloat = 12
 
@@ -59,10 +58,7 @@ struct ActionSearchView: View {
         .task { await load() }
         .onAppear { searchFieldIsFocused = true }
         .onChange(of: visibleEntries.map(\.id)) { selectedIdentifier = visibleEntries.first?.id }
-        .onChange(of: selectedCategoryName) { previousName, newName in
-            selectedSubcategory = nil
-            scrollChipRow(fromCategoryNamed: previousName, toCategoryNamed: newName)
-        }
+        .onChange(of: selectedCategoryName) { selectedSubcategory = nil }
     }
 
     private var contents: CherriActionRegistry.Contents? {
@@ -101,22 +97,30 @@ struct ActionSearchView: View {
     @ViewBuilder
     private var categoryBar: some View {
         if let contents {
-            ScrollView(.horizontal, showsIndicators: false) {
-                glassContainer {
-                    HStack(spacing: 6) {
-                        if let selectedCategory = contents.categories.first(where: { $0.name == selectedCategoryName }) {
-                            subcategoryChips(of: selectedCategory)
-                        } else {
-                            categoryChips(of: contents.categories)
+            ScrollViewReader { proxy in
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 0) {
+                        Color.clear
+                            .frame(width: 1, height: 1)
+                            .id(Self.rowStartID)
+                        glassContainer {
+                            HStack(spacing: 6) {
+                                if let selectedCategory = contents.categories.first(where: { $0.name == selectedCategoryName }) {
+                                    subcategoryChips(of: selectedCategory)
+                                } else {
+                                    categoryChips(of: contents.categories)
+                                }
+                            }
+                            .coordinateSpace(name: Self.chipContentSpace)
                         }
+                        .padding(.horizontal, Self.chipRowMargin)
                     }
-                    .scrollTargetLayout()
-                    .coordinateSpace(name: Self.chipContentSpace)
+                }
+                .onGeometryChange(for: CGFloat.self) { $0.size.width } action: { chipRowWidth = $0 }
+                .onChange(of: selectedCategoryName) { previousName, newName in
+                    scrollChipRow(proxy, fromCategoryNamed: previousName, toCategoryNamed: newName)
                 }
             }
-            .onGeometryChange(for: CGFloat.self) { $0.size.width } action: { chipRowWidth = $0 }
-            .contentMargins(.horizontal, Self.chipRowMargin, for: .scrollContent)
-            .scrollPosition(id: $chipScrollTarget, anchor: chipScrollAnchor)
             .animation(.smooth(duration: 0.35), value: selectedCategoryName)
             .animation(.snappy, value: selectedSubcategory)
             .padding(.vertical, 8)
@@ -169,16 +173,15 @@ struct ActionSearchView: View {
     /// Runs in the update after the swap, because the row is still short in the update that swaps it and a position
     /// further right than that would be clamped to the left. Going in starts the subcategories at the left. Going back
     /// centers the category that was open when it lies past the first screenful of chips, and otherwise starts at the left.
-    private func scrollChipRow(fromCategoryNamed previousName: String?, toCategoryNamed newName: String?) {
+    /// Scrolling by id with a proxy rather than a bound position, because a bound position ignores a target equal to its current value.
+    private func scrollChipRow(_ proxy: ScrollViewProxy, fromCategoryNamed previousName: String?, toCategoryNamed newName: String?) {
         let isGoingBack = newName == nil
         let isPastFirstScreenful = openedCategoryChipFrame.map { $0.maxX + Self.chipRowMargin > chipRowWidth } ?? false
         withAnimation(.smooth(duration: 0.35)) {
             if isGoingBack, isPastFirstScreenful, let previousName {
-                chipScrollAnchor = .center
-                chipScrollTarget = Self.chipID(ofCategoryNamed: previousName)
+                proxy.scrollTo(Self.chipID(ofCategoryNamed: previousName), anchor: .center)
             } else {
-                chipScrollAnchor = .leading
-                chipScrollTarget = isGoingBack ? Self.allChipID : Self.backButtonID
+                proxy.scrollTo(Self.rowStartID, anchor: .leading)
             }
         }
     }
