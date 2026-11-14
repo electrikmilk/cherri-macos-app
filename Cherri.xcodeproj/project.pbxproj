@@ -30,6 +30,7 @@
 		7230F0B82F2C000100AB0001 /* PreviewPane.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7230F0B72F2C000100AB0001 /* PreviewPane.swift */; };
 		7230F0BA2F2C000100AB0001 /* ProcessRunner.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7230F0B92F2C000100AB0001 /* ProcessRunner.swift */; };
 		7230F0C10000000000AB0002 /* CherriCatalog.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7230F0C10000000000AB0001 /* CherriCatalog.swift */; };
+		7230F0C269070CD6137DC78E /* ActionSearchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7230F0C22377CF172EFD58A2 /* ActionSearchView.swift */; };
 		7230F0C21AF0C35B1AAA2C64 /* ActionInsertion.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7230F0C22E3FA77222D51D6D /* ActionInsertion.swift */; };
 		7230F0C2B913F2BEAA365A24 /* ActionSearchRanker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7230F0C22A02A0F17D579A9F /* ActionSearchRanker.swift */; };
 		7230F0C20549AC6CA14A8AEC /* CherriActionRegistry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7230F0C2436D0042A073935D /* CherriActionRegistry.swift */; };
@@ -85,6 +86,7 @@
 		7230F0B72F2C000100AB0001 /* PreviewPane.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreviewPane.swift; sourceTree = "<group>"; };
 		7230F0B92F2C000100AB0001 /* ProcessRunner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProcessRunner.swift; sourceTree = "<group>"; };
 		7230F0C10000000000AB0001 /* CherriCatalog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CherriCatalog.swift; sourceTree = "<group>"; };
+		7230F0C22377CF172EFD58A2 /* ActionSearchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActionSearchView.swift; sourceTree = "<group>"; };
 		7230F0C22E3FA77222D51D6D /* ActionInsertion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActionInsertion.swift; sourceTree = "<group>"; };
 		7230F0C22A02A0F17D579A9F /* ActionSearchRanker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActionSearchRanker.swift; sourceTree = "<group>"; };
 		7230F0C2436D0042A073935D /* CherriActionRegistry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CherriActionRegistry.swift; sourceTree = "<group>"; };
@@ -155,6 +157,7 @@
 				72213BD42B1D24EB00590D99 /* cherri_binary */,
 				7230F0B92F2C000100AB0001 /* ProcessRunner.swift */,
 				7230F0C10000000000AB0001 /* CherriCatalog.swift */,
+				7230F0C22377CF172EFD58A2 /* ActionSearchView.swift */,
 				7230F0C22E3FA77222D51D6D /* ActionInsertion.swift */,
 				7230F0C22A02A0F17D579A9F /* ActionSearchRanker.swift */,
 				7230F0C2436D0042A073935D /* CherriActionRegistry.swift */,
@@ -376,6 +379,7 @@
 				72D4674F2B578C9A00547002 /* AppDelegate.swift in Sources */,
 				7230F0BA2F2C000100AB0001 /* ProcessRunner.swift in Sources */,
 				7230F0C10000000000AB0002 /* CherriCatalog.swift in Sources */,
+				7230F0C269070CD6137DC78E /* ActionSearchView.swift in Sources */,
 				7230F0C21AF0C35B1AAA2C64 /* ActionInsertion.swift in Sources */,
 				7230F0C2B913F2BEAA365A24 /* ActionSearchRanker.swift in Sources */,
 				7230F0C20549AC6CA14A8AEC /* CherriActionRegistry.swift in Sources */,

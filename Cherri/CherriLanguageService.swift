@@ -206,7 +206,7 @@ private struct Candidate {
     }
 }
 
-private struct ActionDocumentation: View {
+struct ActionDocumentation: View {
     let action: CherriAction
 
     var body: some View {
