@@ -85,7 +85,8 @@ struct CherriApp: App {
                 }
             }
         }
-        
+        .defaultSize(width: 900, height: 650)
+
         Window("Import Shortcut", id: ImportWindow.id) {
             ImportView()
         }
