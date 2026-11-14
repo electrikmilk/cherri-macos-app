@@ -20,6 +20,7 @@ struct ActionSearchView: View {
     @State private var loadState: LoadState = .loading
     @State private var query = ""
     @State private var selectedCategoryName: String?
+    @State private var searchFieldHeight: CGFloat = 0
     @State private var chipScrollTarget: String?
     /// Where the category row was scrolled to before a category was opened.
     @State private var categoryRowScrollTarget: String?
@@ -46,16 +47,15 @@ struct ActionSearchView: View {
             searchField
             Divider()
             categoryBar
-                .arrowCursorOnHover()
             Divider()
             content
-                .arrowCursorOnHover()
         }
         .frame(width: 520, height: 420)
         .background(.background)
         .clipShape(Self.panelShape)
         .overlay(Self.panelShape.strokeBorder(.separator))
         .shadow(radius: 20)
+        .onContinuousHover(perform: setCursor)
         .task { await load() }
         .onAppear { searchFieldIsFocused = true }
         .onExitCommand(perform: onDismiss)
@@ -94,6 +94,14 @@ struct ActionSearchView: View {
                 .onKeyPress(.downArrow) { moveSelection(by: 1) }
         }
         .padding(12)
+        .onGeometryChange(for: CGFloat.self) { $0.size.height } action: { searchFieldHeight = $0 }
+    }
+
+    /// One handler decides the cursor for the whole panel, so nothing in it can fall back to the editor's I-beam.
+    private func setCursor(for phase: HoverPhase) {
+        guard case .active(let location) = phase else { return }
+        let cursor: NSCursor = location.y < searchFieldHeight ? .iBeam : .arrow
+        cursor.set()
     }
 
     @ViewBuilder
