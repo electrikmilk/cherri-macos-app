@@ -164,3 +164,62 @@ final class ActionSearchRegistryTests: XCTestCase {
         XCTAssertTrue(categoryNames.contains("text"))
     }
 }
+
+final class ActionSearchRankerTests: XCTestCase {
+    private let getPDFText = entry("getPDFText", title: "Get PDF Text", summary: "Get text from PDF.")
+    private let askChatGPT = entry("askChatGPT", title: "Ask Chat GPT", summary: "Ask Chat GPT using a prompt.")
+    private let cheatGopherTool = entry("cheatGopherTool", title: "Cheat Gopher Tool", summary: "Unrelated.")
+    private let makeDiskImage = entry("makeDiskImage", title: "Make Disk Image", summary: "Create a new disk image.")
+    private let playNext = entry("playNext", title: "Play Next", summary: "Play next.")
+    private let playLater = entry("playLater", title: "Play Next", summary: "Play later.")
+    private let skipTrack = entry("skipTrack", title: "Skip Track", summary: "Skip to the next track, or play it.")
+
+    private var allEntries: [CherriActionEntry] {
+        [getPDFText, askChatGPT, cheatGopherTool, makeDiskImage, playNext, playLater, skipTrack]
+    }
+
+    private static func entry(_ identifier: String, title: String, summary: String) -> CherriActionEntry {
+        CherriActionEntry(action: CherriAction(identifier: identifier,
+                                               title: title,
+                                               summary: summary,
+                                               definition: "\(identifier)()",
+                                               signature: "\(identifier)()",
+                                               notes: []),
+                          category: nil,
+                          subcategory: nil)
+    }
+
+    private func rankedIdentifiers(for query: String) -> [String] {
+        ActionSearchRanker.rank(allEntries, matching: query).map(\.action.identifier)
+    }
+
+    func testSubsequenceMatchesIdentifier() {
+        XCTAssertEqual(rankedIdentifiers(for: "gpdf"), ["getPDFText"])
+    }
+
+    func testContiguousMatchOutranksSubsequence() {
+        XCTAssertEqual(rankedIdentifiers(for: "chatgpt"), ["askChatGPT", "cheatGopherTool"])
+    }
+
+    func testQueryIsCaseAndSpaceInsensitive() {
+        XCTAssertEqual(rankedIdentifiers(for: "GETPDF"), ["getPDFText"])
+        XCTAssertEqual(rankedIdentifiers(for: "get pdf"), ["getPDFText"])
+    }
+
+    func testDescriptionWordsMatch() {
+        XCTAssertEqual(rankedIdentifiers(for: "new disk"), ["makeDiskImage"])
+    }
+
+    func testPrefixOutranksDescriptionOnlyMatch() {
+        XCTAssertEqual(rankedIdentifiers(for: "play"), ["playLater", "playNext", "skipTrack"])
+    }
+
+    func testNoMatchReturnsEmpty() {
+        XCTAssertEqual(rankedIdentifiers(for: "zzzz"), [])
+    }
+
+    func testEmptyQueryReturnsAllInOriginalOrder() {
+        XCTAssertEqual(rankedIdentifiers(for: ""), allEntries.map(\.action.identifier))
+        XCTAssertEqual(rankedIdentifiers(for: "   "), allEntries.map(\.action.identifier))
+    }
+}
