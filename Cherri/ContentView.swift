@@ -148,22 +148,35 @@ struct ContentView: View {
         isActionSearchPresented = false
     }
 
+    /// Uses the colors of the editor's inline error popups: the error red at 30% over black or white, with a 50% icon block.
     private var compileErrorBanner: some View {
-        HStack {
-            Label("Unable to compile Shortcut.", systemImage: "exclamationmark.triangle.fill")
-                .fontWeight(.bold)
+        let errorRed = Color(nsColor: .red)
+        let isDarkTheme = theme == .dark
 
-            Spacer()
+        return HStack(spacing: 0) {
+            Image(systemName: "xmark.octagon.fill")
+                .padding(.horizontal, 10)
+                .frame(maxHeight: .infinity)
+                .background(errorRed.opacity(0.5))
 
-            if let missingIncludePath {
-                missingIncludeFix(missingIncludePath)
+            HStack {
+                Text("Unable to compile Shortcut.")
+                    .fontWeight(.bold)
+
+                Spacer()
+
+                if let missingIncludePath {
+                    missingIncludeFix(missingIncludePath)
+                }
             }
+            .padding(.horizontal, 10)
+            .padding(.vertical, 6)
+            .frame(maxWidth: .infinity)
+            .background(errorRed.opacity(0.3))
         }
-        .foregroundStyle(.white)
-        .padding(.horizontal, 12)
-        .padding(.vertical, 8)
-        .background(.red, in: RoundedRectangle(cornerRadius: 10))
-        .padding(EdgeInsets(top: 8, leading: 8, bottom: 4, trailing: 8))
+        .fixedSize(horizontal: false, vertical: true)
+        .background(isDarkTheme ? Color.black : Color.white)
+        .foregroundStyle(isDarkTheme ? Color.white : Color.black)
     }
 
     private func missingIncludeFix(_ includePath: String) -> some View {
