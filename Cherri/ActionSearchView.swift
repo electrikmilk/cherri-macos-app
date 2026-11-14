@@ -20,6 +20,11 @@ struct ActionSearchView: View {
     @State private var query = ""
     @State private var selectedCategoryName: String?
     @State private var chipScrollTarget: String?
+    @State private var chipScrollAnchor: UnitPoint = .leading
+    @State private var chipRowWidth: CGFloat = 0
+    /// Chip frames inside the scrolling content, so they do not change as the row scrolls.
+    @State private var chipFrames: [String: CGRect] = [:]
+    @State private var openedCategoryChipFrame: CGRect?
     @Namespace private var chipNamespace
     @State private var selectedSubcategory: String?
     @State private var selectedIdentifier: String?
@@ -31,6 +36,8 @@ struct ActionSearchView: View {
 
     private static let allChipID = "all"
     private static let backButtonID = "back"
+    private static let chipContentSpace = "chipContent"
+    private static let chipRowMargin: CGFloat = 12
 
     private static func chipID(ofCategoryNamed name: String) -> String {
         "category:\(name)"
@@ -104,10 +111,12 @@ struct ActionSearchView: View {
                         }
                     }
                     .scrollTargetLayout()
+                    .coordinateSpace(name: Self.chipContentSpace)
                 }
             }
-            .contentMargins(.horizontal, 12, for: .scrollContent)
-            .scrollPosition(id: $chipScrollTarget, anchor: .leading)
+            .onGeometryChange(for: CGFloat.self) { $0.size.width } action: { chipRowWidth = $0 }
+            .contentMargins(.horizontal, Self.chipRowMargin, for: .scrollContent)
+            .scrollPosition(id: $chipScrollTarget, anchor: chipScrollAnchor)
             .animation(.smooth(duration: 0.35), value: selectedCategoryName)
             .animation(.snappy, value: selectedSubcategory)
             .padding(.vertical, 8)
@@ -129,6 +138,7 @@ struct ActionSearchView: View {
         chip("All", id: Self.allChipID, isSelected: true) {}
         ForEach(categories.map { (id: Self.chipID(ofCategoryNamed: $0.name), category: $0) }, id: \.id) { id, category in
             chip(category.title, id: id, isSelected: false) {
+                openedCategoryChipFrame = chipFrames[id]
                 selectedCategoryName = category.name
             }
         }
@@ -157,17 +167,19 @@ struct ActionSearchView: View {
     }
 
     /// Runs in the update after the swap, because the row is still short in the update that swaps it and a position
-    /// further right than that would be clamped to the left. Going back shows the category that was open, and going in
-    /// starts the subcategories at the left.
+    /// further right than that would be clamped to the left. Going in starts the subcategories at the left. Going back
+    /// centers the category that was open when it lies past the first screenful of chips, and otherwise starts at the left.
     private func scrollChipRow(fromCategoryNamed previousName: String?, toCategoryNamed newName: String?) {
-        let target: String
-        if newName == nil, let previousName {
-            target = Self.chipID(ofCategoryNamed: previousName)
-        } else {
-            target = Self.backButtonID
-        }
+        let isGoingBack = newName == nil
+        let isPastFirstScreenful = openedCategoryChipFrame.map { $0.maxX + Self.chipRowMargin > chipRowWidth } ?? false
         withAnimation(.smooth(duration: 0.35)) {
-            chipScrollTarget = target
+            if isGoingBack, isPastFirstScreenful, let previousName {
+                chipScrollAnchor = .center
+                chipScrollTarget = Self.chipID(ofCategoryNamed: previousName)
+            } else {
+                chipScrollAnchor = .leading
+                chipScrollTarget = isGoingBack ? Self.allChipID : Self.backButtonID
+            }
         }
     }
 
@@ -197,8 +209,13 @@ struct ActionSearchView: View {
         }
     }
 
-    @ViewBuilder
     private func chip(_ title: String, id: String, isSelected: Bool, select: @escaping () -> Void) -> some View {
+        chipBody(title, id: id, isSelected: isSelected, select: select)
+            .onGeometryChange(for: CGRect.self) { $0.frame(in: .named(Self.chipContentSpace)) } action: { chipFrames[id] = $0 }
+    }
+
+    @ViewBuilder
+    private func chipBody(_ title: String, id: String, isSelected: Bool, select: @escaping () -> Void) -> some View {
         if #available(macOS 26, *) {
             glassChip(title, id: id, isSelected: isSelected, select: select)
         } else {
