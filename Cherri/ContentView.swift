@@ -308,7 +308,9 @@ struct ContentView: View {
 
     func handleCompilerOutput(output: String) {
         if output.contains("Warning:") {
-            let matches = output.matches(of: /Warning: (?<message>(.|\n)*?)\n\n/)
+            // Messages can contain blank lines, so a located warning is read up to its trailing (line:column)
+            // without running into the next warning or error.
+            let matches = output.matches(of: /Warning: (?<message>(?:(?!Warning:|Error:)(?s:.))*?\(\d+:\d+\)(?=\n)|(?s:.)*?(?=\n\n))/)
             if matches.count != 0 {
                 hasWarnings = true
             }
