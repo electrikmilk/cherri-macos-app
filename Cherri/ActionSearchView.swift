@@ -20,8 +20,10 @@ struct ActionSearchView: View {
     @State private var loadState: LoadState = .loading
     @State private var query = ""
     @State private var selectedCategoryName: String?
-    /// Kept here because the category row is removed while a category is open, and it should return where it was.
-    @State private var categoryScrollTarget: String?
+    @State private var chipScrollTarget: String?
+    /// Where the category row was scrolled to before a category was opened.
+    @State private var categoryRowScrollTarget: String?
+    @Namespace private var chipNamespace
     @State private var selectedSubcategory: String?
     @State private var selectedIdentifier: String?
     @State private var identifierShowingInfo: String?
@@ -31,6 +33,12 @@ struct ActionSearchView: View {
     private var windowIsActive: Bool { controlActiveState != .inactive }
 
     private static let allChipID = "all"
+    private static let backButtonID = "back"
+
+    private static func chipID(of category: CherriActionCategory) -> String {
+        "category:\(category.name)"
+    }
+
     private static let panelShape = RoundedRectangle(cornerRadius: 12, style: .continuous)
 
     var body: some View {
@@ -91,35 +99,42 @@ struct ActionSearchView: View {
     @ViewBuilder
     private var categoryBar: some View {
         if let contents {
-            Group {
-                if let selectedCategory = contents.categories.first(where: { $0.name == selectedCategoryName }) {
-                    ScrollView(.horizontal, showsIndicators: false) {
-                        HStack(spacing: 6) { subcategoryChips(of: selectedCategory) }
-                            .padding(.horizontal, 12)
+            ScrollView(.horizontal, showsIndicators: false) {
+                glassContainer {
+                    HStack(spacing: 6) {
+                        if let selectedCategory = contents.categories.first(where: { $0.name == selectedCategoryName }) {
+                            subcategoryChips(of: selectedCategory)
+                        } else {
+                            categoryChips(of: contents.categories)
+                        }
                     }
-                    .transition(.move(edge: .trailing).combined(with: .opacity))
-                } else {
-                    ScrollView(.horizontal, showsIndicators: false) {
-                        HStack(spacing: 6) { categoryChips(of: contents.categories) }
-                            .scrollTargetLayout()
-                            .padding(.horizontal, 12)
-                    }
-                    .scrollPosition(id: $categoryScrollTarget, anchor: .leading)
-                    .transition(.move(edge: .leading).combined(with: .opacity))
+                    .scrollTargetLayout()
                 }
+                .padding(.horizontal, 12)
             }
-            .animation(.smooth(duration: 0.3), value: selectedCategoryName)
+            .scrollPosition(id: $chipScrollTarget, anchor: .leading)
+            .animation(.smooth(duration: 0.35), value: selectedCategoryName)
+            .animation(.snappy, value: selectedSubcategory)
             .padding(.vertical, 8)
+        }
+    }
+
+    /// Chips share one glass container so a tapped category morphs into the chip that names it in the subcategory row.
+    @ViewBuilder
+    private func glassContainer<Content: View>(@ViewBuilder content: () -> Content) -> some View {
+        if #available(macOS 26, *) {
+            GlassEffectContainer(spacing: 6, content: content)
+        } else {
+            content()
         }
     }
 
     @ViewBuilder
     private func categoryChips(of categories: [CherriActionCategory]) -> some View {
-        chip("All", isSelected: true) {}
-            .id(Self.allChipID)
+        chip("All", id: Self.allChipID, isSelected: true) {}
         ForEach(categories, id: \.name) { category in
-            chip(category.title, isSelected: false) {
-                selectedCategoryName = category.name
+            chip(category.title, id: Self.chipID(of: category), isSelected: false) {
+                open(category)
             }
         }
     }
@@ -127,58 +142,74 @@ struct ActionSearchView: View {
     @ViewBuilder
     private func subcategoryChips(of category: CherriActionCategory) -> some View {
         backButton(to: "all categories from \(category.title)")
-        chip(category.title, isSelected: selectedSubcategory == nil) {
+        chip(category.title, id: Self.chipID(of: category), isSelected: selectedSubcategory == nil) {
             selectedSubcategory = nil
         }
         if !category.subcategories.isEmpty {
             Divider()
                 .frame(height: 16)
+                .id("divider")
             ForEach(category.subcategories, id: \.self) { subcategory in
-                chip(subcategory, isSelected: selectedSubcategory == subcategory) {
+                chip(subcategory, id: "subcategory:\(subcategory)", isSelected: selectedSubcategory == subcategory) {
                     selectedSubcategory = subcategory
                 }
             }
         }
     }
 
+    /// The category row's scroll position is restored on the way back, and the subcategory row always starts at the left.
+    private func open(_ category: CherriActionCategory) {
+        categoryRowScrollTarget = chipScrollTarget
+        chipScrollTarget = Self.backButtonID
+        selectedCategoryName = category.name
+    }
+
+    private func closeCategory() {
+        selectedCategoryName = nil
+        chipScrollTarget = categoryRowScrollTarget
+    }
+
     @ViewBuilder
     private func backButton(to destination: String) -> some View {
-        let leaveCategory = { selectedCategoryName = nil }
         if #available(macOS 26, *) {
-            Button(action: leaveCategory) {
+            Button(action: closeCategory) {
                 Image(systemName: "chevron.left")
                     .fontWeight(.semibold)
                     .frame(width: 28, height: 28)
             }
             .buttonStyle(.plain)
             .glassEffect(.regular.interactive(), in: .circle)
+            .glassEffectID(Self.backButtonID, in: chipNamespace)
+            .id(Self.backButtonID)
             .help("Back to \(destination)")
             .accessibilityLabel("Back")
         } else {
-            Button(action: leaveCategory) {
+            Button(action: closeCategory) {
                 Image(systemName: "chevron.left")
             }
             .buttonStyle(.borderless)
+            .id(Self.backButtonID)
             .help("Back to \(destination)")
             .accessibilityLabel("Back")
         }
     }
 
     @ViewBuilder
-    private func chip(_ title: String, isSelected: Bool, select: @escaping () -> Void) -> some View {
+    private func chip(_ title: String, id: String, isSelected: Bool, select: @escaping () -> Void) -> some View {
         if #available(macOS 26, *) {
-            glassChip(title, isSelected: isSelected, select: select)
+            glassChip(title, id: id, isSelected: isSelected, select: select)
         } else {
             Toggle(title, isOn: Binding(get: { isSelected }, set: { _ in select() }))
                 .toggleStyle(.button)
                 .buttonBorderShape(.capsule)
                 .controlSize(.small)
                 .tint(.accentColor)
+                .id(id)
         }
     }
 
     @available(macOS 26, *)
-    private func glassChip(_ title: String, isSelected: Bool, select: @escaping () -> Void) -> some View {
+    private func glassChip(_ title: String, id: String, isSelected: Bool, select: @escaping () -> Void) -> some View {
         Button(action: select) {
             Text(title)
                 .padding(.horizontal, 14)
@@ -187,7 +218,8 @@ struct ActionSearchView: View {
         }
         .buttonStyle(.plain)
         .glassEffect(isSelected ? .regular.tint(.accentColor).interactive() : .regular.interactive(), in: .capsule)
-        .animation(.snappy, value: isSelected)
+        .glassEffectID(id, in: chipNamespace)
+        .id(id)
         .accessibilityAddTraits(isSelected ? .isSelected : [])
     }
 
