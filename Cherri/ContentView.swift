@@ -61,19 +61,7 @@ struct ContentView: View {
         VStack {
             NavigationStack {
                 if hasError {
-                    VStack(spacing: 6) {
-                        HStack {
-                            Image(systemName: "exclamationmark.triangle.fill")
-                                .foregroundColor(.red)
-                            Text("Unable to compile Shortcut.")
-                        }
-                        .fontWeight(.bold)
-
-                        if let missingIncludePath {
-                            missingIncludeFix(missingIncludePath)
-                        }
-                    }
-                    .padding(EdgeInsets(top: 12, leading: 0, bottom: 5, trailing: 0))
+                    compileErrorBanner
                 }
                 
                 CodeEditor(text: $document.text,
@@ -160,16 +148,35 @@ struct ContentView: View {
         isActionSearchPresented = false
     }
 
+    private var compileErrorBanner: some View {
+        HStack {
+            Label("Unable to compile Shortcut.", systemImage: "exclamationmark.triangle.fill")
+                .fontWeight(.bold)
+
+            Spacer()
+
+            if let missingIncludePath {
+                missingIncludeFix(missingIncludePath)
+            }
+        }
+        .foregroundStyle(.white)
+        .padding(.horizontal, 12)
+        .padding(.vertical, 8)
+        .background(.red, in: RoundedRectangle(cornerRadius: 10))
+        .padding(EdgeInsets(top: 8, leading: 8, bottom: 4, trailing: 8))
+    }
+
     private func missingIncludeFix(_ includePath: String) -> some View {
         HStack {
             Text("This file is missing #include '\(includePath)'")
             Button("Fix", systemImage: "hammer.fill") {
                 addMissingInclude(includePath)
             }
+            .buttonStyle(.bordered)
+            .controlSize(.small)
             .disabled(busy)
             .help("Add #include '\(includePath)' to this file and build again")
         }
-        .font(.callout)
     }
 
     private func addMissingInclude(_ includePath: String) {
