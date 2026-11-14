@@ -279,6 +279,23 @@ struct ActionSearchView: View {
     }
 }
 
+/// The editor's text view keeps its I-beam cursor rect under SwiftUI content drawn over it, so the overlay claims the area.
+struct ArrowCursorArea: NSViewRepresentable {
+    private final class ArrowCursorView: NSView {
+        override func resetCursorRects() {
+            addCursorRect(bounds, cursor: .arrow)
+        }
+    }
+
+    func makeNSView(context: Context) -> NSView {
+        ArrowCursorView()
+    }
+
+    func updateNSView(_ nsView: NSView, context: Context) {
+        nsView.window?.invalidateCursorRects(for: nsView)
+    }
+}
+
 private struct ActionInfoView: View {
     let entry: CherriActionEntry
 

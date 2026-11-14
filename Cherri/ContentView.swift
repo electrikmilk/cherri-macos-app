@@ -135,6 +135,7 @@ struct ContentView: View {
                     ActionSearchView(onInsert: insertAction, onDismiss: dismissActionSearch)
                         .padding(.top, 40)
                 }
+                .background(ArrowCursorArea())
             }
         }
         .inspector(isPresented: $showPreview) {
