@@ -166,6 +166,7 @@ struct ActionSearchView: View {
                 Image(systemName: "chevron.left")
                     .fontWeight(.semibold)
                     .frame(width: 28, height: 28)
+                    .contentShape(Circle())
             }
             .buttonStyle(.plain)
             .glassEffect(.regular.interactive(), in: .circle)
@@ -205,6 +206,7 @@ struct ActionSearchView: View {
                 .padding(.horizontal, 14)
                 .padding(.vertical, 6)
                 .foregroundStyle(isSelected ? Color.white : Color.primary)
+                .contentShape(Capsule())
         }
         .buttonStyle(.plain)
         .glassEffect(isSelected ? .regular.tint(.accentColor).interactive() : .regular.interactive(), in: .capsule)
