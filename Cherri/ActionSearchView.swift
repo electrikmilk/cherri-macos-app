@@ -147,6 +147,7 @@ struct ActionSearchView: View {
             }
             .padding(.leading, Self.chipRowMargin)
             .padding(.trailing, 6)
+            .zIndex(1)
             if !category.subcategories.isEmpty {
                 ScrollView(.horizontal, showsIndicators: false) {
                     glassContainer {
@@ -160,7 +161,7 @@ struct ActionSearchView: View {
                     }
                     .padding(.trailing, Self.chipRowMargin)
                 }
-                .clipped()
+                .clipShape(Rectangle())
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
