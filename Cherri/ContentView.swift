@@ -61,19 +61,18 @@ struct ContentView: View {
         VStack {
             NavigationStack {
                 if hasError {
-                    HStack {
-                        Image(systemName: "exclamationmark.triangle.fill")
-                            .foregroundColor(.red)
-                        Text("Unable to compile Shortcut.")
+                    VStack(spacing: 6) {
+                        HStack {
+                            Image(systemName: "exclamationmark.triangle.fill")
+                                .foregroundColor(.red)
+                            Text("Unable to compile Shortcut.")
+                        }
+                        .fontWeight(.bold)
+
                         if let missingIncludePath {
-                            Button("Fix", systemImage: "hammer.fill") {
-                                addMissingInclude(missingIncludePath)
-                            }
-                            .disabled(busy)
-                            .help("Add #include '\(missingIncludePath)'")
+                            missingIncludeFix(missingIncludePath)
                         }
                     }
-                    .fontWeight(.bold)
                     .padding(EdgeInsets(top: 12, leading: 0, bottom: 5, trailing: 0))
                 }
                 
@@ -159,6 +158,18 @@ struct ContentView: View {
         document.text = result.text
         editPosition.selections = [result.selection]
         isActionSearchPresented = false
+    }
+
+    private func missingIncludeFix(_ includePath: String) -> some View {
+        HStack {
+            Text("This file is missing #include '\(includePath)'")
+            Button("Fix", systemImage: "hammer.fill") {
+                addMissingInclude(includePath)
+            }
+            .disabled(busy)
+            .help("Add #include '\(includePath)' to this file and build again")
+        }
+        .font(.callout)
     }
 
     private func addMissingInclude(_ includePath: String) {
