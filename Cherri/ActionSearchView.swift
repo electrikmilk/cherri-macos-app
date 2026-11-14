@@ -20,8 +20,6 @@ struct ActionSearchView: View {
     @State private var query = ""
     @State private var selectedCategoryName: String?
     @State private var chipScrollTarget: String?
-    /// Where the category row was scrolled to before a category was opened.
-    @State private var categoryRowScrollTarget: String?
     @Namespace private var chipNamespace
     @State private var selectedSubcategory: String?
     @State private var selectedIdentifier: String?
@@ -34,8 +32,12 @@ struct ActionSearchView: View {
     private static let allChipID = "all"
     private static let backButtonID = "back"
 
-    private static func chipID(of category: CherriActionCategory) -> String {
-        "category:\(category.name)"
+    private static func chipID(ofCategoryNamed name: String) -> String {
+        "category:\(name)"
+    }
+
+    private static func chipID(ofSubcategory name: String) -> String {
+        "subcategory:\(name)"
     }
 
     var body: some View {
@@ -50,9 +52,9 @@ struct ActionSearchView: View {
         .task { await load() }
         .onAppear { searchFieldIsFocused = true }
         .onChange(of: visibleEntries.map(\.id)) { selectedIdentifier = visibleEntries.first?.id }
-        .onChange(of: selectedCategoryName) { _, categoryName in
+        .onChange(of: selectedCategoryName) { previousName, newName in
             selectedSubcategory = nil
-            scrollChipRow(afterCategoryChangedTo: categoryName)
+            scrollChipRow(fromCategoryNamed: previousName, toCategoryNamed: newName)
         }
     }
 
@@ -125,9 +127,9 @@ struct ActionSearchView: View {
     @ViewBuilder
     private func categoryChips(of categories: [CherriActionCategory]) -> some View {
         chip("All", id: Self.allChipID, isSelected: true) {}
-        ForEach(categories, id: \.name) { category in
-            chip(category.title, id: Self.chipID(of: category), isSelected: false) {
-                open(category)
+        ForEach(categories.map { (id: Self.chipID(ofCategoryNamed: $0.name), category: $0) }, id: \.id) { id, category in
+            chip(category.title, id: id, isSelected: false) {
+                selectedCategoryName = category.name
             }
         }
     }
@@ -135,36 +137,37 @@ struct ActionSearchView: View {
     @ViewBuilder
     private func subcategoryChips(of category: CherriActionCategory) -> some View {
         backButton(to: "all categories from \(category.title)")
-        chip(category.title, id: Self.chipID(of: category), isSelected: selectedSubcategory == nil) {
+        chip(category.title, id: Self.chipID(ofCategoryNamed: category.name), isSelected: selectedSubcategory == nil) {
             selectedSubcategory = nil
         }
         if !category.subcategories.isEmpty {
             Divider()
                 .frame(height: 16)
                 .id("divider")
-            ForEach(category.subcategories, id: \.self) { subcategory in
-                chip(subcategory, id: "subcategory:\(subcategory)", isSelected: selectedSubcategory == subcategory) {
+            ForEach(category.subcategories.map { (id: Self.chipID(ofSubcategory: $0), name: $0) }, id: \.id) { id, subcategory in
+                chip(subcategory, id: id, isSelected: selectedSubcategory == subcategory) {
                     selectedSubcategory = subcategory
                 }
             }
         }
     }
 
-    /// The category row's scroll position is restored on the way back, and the subcategory row always starts at the left.
-    private func open(_ category: CherriActionCategory) {
-        categoryRowScrollTarget = chipScrollTarget
-        selectedCategoryName = category.name
-    }
-
     private func closeCategory() {
         selectedCategoryName = nil
     }
 
-    /// Scrolling in a later update than the swap, because the row is still short in the update that swaps it and a
-    /// position further right than that would be clamped to the left.
-    private func scrollChipRow(afterCategoryChangedTo categoryName: String?) {
+    /// Runs in the update after the swap, because the row is still short in the update that swaps it and a position
+    /// further right than that would be clamped to the left. Going back shows the category that was open, and going in
+    /// starts the subcategories at the left.
+    private func scrollChipRow(fromCategoryNamed previousName: String?, toCategoryNamed newName: String?) {
+        let target: String
+        if newName == nil, let previousName {
+            target = Self.chipID(ofCategoryNamed: previousName)
+        } else {
+            target = Self.backButtonID
+        }
         withAnimation(.smooth(duration: 0.35)) {
-            chipScrollTarget = categoryName == nil ? categoryRowScrollTarget : Self.backButtonID
+            chipScrollTarget = target
         }
     }
 
