@@ -15,14 +15,37 @@ class EditorController: ObservableObject {
             await currentContentView?.compileFile()
         }
     }
-    func showActionSearch() {
-        currentContentView?.presentActionSearch()
-    }
     func buildAndOpen() {
         Task {
             guard let contentView = currentContentView else { return }
             await contentView.compileFile()
             contentView.exportShortcut()
+        }
+    }
+}
+
+private struct ShowActionSearchKey: FocusedValueKey {
+    typealias Value = () -> Void
+}
+
+extension FocusedValues {
+    /// Published by the focused document window, so the menu command acts on the window the user is in.
+    var showActionSearch: (() -> Void)? {
+        get { self[ShowActionSearchKey.self] }
+        set { self[ShowActionSearchKey.self] = newValue }
+    }
+}
+
+struct ActionSearchCommands: Commands {
+    @FocusedValue(\.showActionSearch) private var showActionSearch
+
+    var body: some Commands {
+        CommandGroup(after: .textEditing) {
+            Button("Search Actions...", systemImage: "magnifyingglass") {
+                showActionSearch?()
+            }
+            .keyboardShortcut("a", modifiers: [.command, .shift])
+            .disabled(showActionSearch == nil)
         }
     }
 }
@@ -50,13 +73,7 @@ struct CherriApp: App {
                 .keyboardShortcut("r", modifiers: [.command])
                 .disabled((editorController.currentContentView == nil))
             }
-            CommandGroup(after: .textEditing) {
-                Button("Search Actions...", systemImage: "magnifyingglass") {
-                    editorController.showActionSearch()
-                }
-                .keyboardShortcut("a", modifiers: [.command, .shift])
-                .disabled(editorController.currentContentView == nil)
-            }
+            ActionSearchCommands()
             CommandGroup(replacing: .help) {
                 Link("Documentation Site", destination: URL(string: "https://cherrilang.org/language/")!)
             }

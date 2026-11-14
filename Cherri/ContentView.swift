@@ -142,12 +142,13 @@ struct ContentView: View {
                 .inspectorColumnWidth(min: 280, ideal: 380, max: 600)
         }
         .frame(minWidth: 300, minHeight: 600)
+        .focusedSceneValue(\.showActionSearch, presentActionSearch)
         .onAppear {
             editorController.currentContentView = self
         }
     }
     
-    func presentActionSearch() {
+    private func presentActionSearch() {
         isActionSearchPresented = true
     }
 
