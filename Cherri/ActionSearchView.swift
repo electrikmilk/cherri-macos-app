@@ -36,7 +36,7 @@ struct ActionSearchView: View {
             content
         }
         .frame(width: 520, height: 420)
-        .background(.regularMaterial)
+        .background(.background)
         .clipShape(Self.panelShape)
         .overlay(Self.panelShape.strokeBorder(.separator))
         .shadow(radius: 20)
@@ -63,10 +63,6 @@ struct ActionSearchView: View {
         return ActionSearchRanker.rank(entriesInSelectedCategory, matching: query)
     }
 
-    private var subcategoriesOfSelectedCategory: [String] {
-        contents?.categories.first { $0.name == selectedCategoryName }?.subcategories ?? []
-    }
-
     // MARK: Header
 
     private var searchField: some View {
@@ -87,47 +83,78 @@ struct ActionSearchView: View {
     @ViewBuilder
     private var categoryBar: some View {
         if let contents {
-            HStack(spacing: 8) {
-                ScrollView(.horizontal, showsIndicators: false) {
-                    HStack(spacing: 6) {
-                        categoryChip("All", isSelected: selectedCategoryName == nil) {
-                            selectedCategoryName = nil
-                        }
-                        ForEach(contents.categories, id: \.name) { category in
-                            categoryChip(category.title, isSelected: selectedCategoryName == category.name) {
-                                selectedCategoryName = category.name
-                            }
-                        }
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 6) {
+                    if let selectedCategory = contents.categories.first(where: { $0.name == selectedCategoryName }) {
+                        subcategoryChips(of: selectedCategory)
+                    } else {
+                        categoryChips(of: contents.categories)
                     }
-                    .padding(.horizontal, 12)
                 }
-                subcategoryMenu
-                    .padding(.trailing, 12)
+                .padding(.horizontal, 12)
             }
             .padding(.vertical, 8)
         }
     }
 
-    private func categoryChip(_ title: String, isSelected: Bool, select: @escaping () -> Void) -> some View {
-        Toggle(title, isOn: Binding(get: { isSelected }, set: { _ in select() }))
-            .toggleStyle(.button)
-            .buttonBorderShape(.capsule)
-            .controlSize(.small)
-            .tint(.accentColor)
+    @ViewBuilder
+    private func categoryChips(of categories: [CherriActionCategory]) -> some View {
+        chip("All", isSelected: true) {}
+        ForEach(categories, id: \.name) { category in
+            chip(category.title, isSelected: false) {
+                selectedCategoryName = category.name
+            }
+        }
     }
 
     @ViewBuilder
-    private var subcategoryMenu: some View {
-        if !subcategoriesOfSelectedCategory.isEmpty {
-            Picker("Subcategory", selection: $selectedSubcategory) {
-                Text("All subcategories").tag(String?.none)
-                ForEach(subcategoriesOfSelectedCategory, id: \.self) { subcategory in
-                    Text(subcategory).tag(Optional(subcategory))
+    private func subcategoryChips(of category: CherriActionCategory) -> some View {
+        Button {
+            selectedCategoryName = nil
+        } label: {
+            Label("Categories", systemImage: "chevron.left")
+        }
+        .buttonStyle(.borderless)
+        .help("Back to all categories")
+        Text(category.title)
+            .font(.headline)
+        if !category.subcategories.isEmpty {
+            chip("All", isSelected: selectedSubcategory == nil) {
+                selectedSubcategory = nil
+            }
+            ForEach(category.subcategories, id: \.self) { subcategory in
+                chip(subcategory, isSelected: selectedSubcategory == subcategory) {
+                    selectedSubcategory = subcategory
                 }
             }
-            .labelsHidden()
+        }
+    }
+
+    @ViewBuilder
+    private func chip(_ title: String, isSelected: Bool, select: @escaping () -> Void) -> some View {
+        if #available(macOS 26, *) {
+            glassChip(title, isSelected: isSelected, select: select)
+        } else {
+            Toggle(title, isOn: Binding(get: { isSelected }, set: { _ in select() }))
+                .toggleStyle(.button)
+                .buttonBorderShape(.capsule)
+                .controlSize(.small)
+                .tint(.red)
+        }
+    }
+
+    @available(macOS 26, *)
+    @ViewBuilder
+    private func glassChip(_ title: String, isSelected: Bool, select: @escaping () -> Void) -> some View {
+        let button = Button(title, action: select)
+            .buttonBorderShape(.capsule)
             .controlSize(.small)
-            .fixedSize()
+            .tint(.red)
+            .accessibilityAddTraits(isSelected ? .isSelected : [])
+        if isSelected {
+            button.buttonStyle(.glassProminent)
+        } else {
+            button.buttonStyle(.glass)
         }
     }
 
