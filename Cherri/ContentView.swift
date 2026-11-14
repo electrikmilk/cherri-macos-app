@@ -151,7 +151,7 @@ struct ContentView: View {
     }
 
     /// Uses the colors of the editor's inline error popups: the error red at 30% over black or white, with a 50% icon block.
-    /// The backgrounds stay inside the safe area, and the top gap clears the toolbar buttons, which hang below it.
+    /// The backgrounds stay inside the safe area, otherwise they paint under the window toolbar.
     private var compileErrorBanner: some View {
         let errorRed = Color(nsColor: .red)
         let isDarkTheme = theme == .dark
