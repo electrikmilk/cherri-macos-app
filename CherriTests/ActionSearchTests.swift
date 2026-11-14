@@ -377,4 +377,34 @@ final class ActionInsertionTests: XCTestCase {
                        (text as NSString).replacingCharacters(in: selection, with: "define("))
         XCTAssertTrue((result.text as NSString).substring(to: result.selection.location).hasSuffix("define("))
     }
+
+    func testRequiredIncludePathIsReadFromTheCompilerError() {
+        let message = "Action 'define()' requires include:\n\n#include 'actions/text'"
+
+        XCTAssertEqual(ActionInsertion.requiredIncludePath(inCompilerError: message), "actions/text")
+    }
+
+    func testOtherCompilerErrorsHaveNoRequiredIncludePath() {
+        XCTAssertNil(ActionInsertion.requiredIncludePath(inCompilerError: "Undefined action 'nope()'"))
+    }
+
+    func testAddIncludeGoesBelowLastExistingIncludeAndSelectsTheNewLine() {
+        let text = "#include 'actions/device'\n#define color red\n"
+
+        let result = ActionInsertion.addInclude("actions/text", to: text)
+
+        XCTAssertEqual(result, ActionInsertionResult(text: "#include 'actions/device'\n#include 'actions/text'\n#define color red\n",
+                                                     selection: NSRange(location: 26, length: 0)))
+    }
+
+    func testAddIncludeAfterLastLineWithoutTrailingNewlineSelectsTheNewLine() {
+        let result = ActionInsertion.addInclude("actions/text", to: "#include 'actions/device'")
+
+        XCTAssertEqual(result?.text, "#include 'actions/device'\n#include 'actions/text'\n")
+        XCTAssertEqual(result?.selection, NSRange(location: 26, length: 0))
+    }
+
+    func testAddIncludeAlreadyPresentReturnsNil() {
+        XCTAssertNil(ActionInsertion.addInclude("actions/text", to: "#include 'actions/text'\n"))
+    }
 }

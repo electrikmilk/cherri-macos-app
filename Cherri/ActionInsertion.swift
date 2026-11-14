@@ -15,6 +15,15 @@ enum ActionInsertion {
     private static let includeDirective = "#include"
     private static let includePathRegex = /#include\s+['"](?<path>[^'"]+)['"]/
 
+    private static let requiredIncludeErrorRegex = /requires include:\s+#include\s+['"](?<path>[^'"]+)['"]/
+
+    private struct IncludeAddition {
+        let text: String
+        let insertionOffset: Int
+        let directiveOffset: Int
+        let insertedLength: Int
+    }
+
     private struct IncludeBlock {
         let paths: [String]
         /// Where the line after the last `#include` line starts, `0` when there is none.
@@ -31,16 +40,39 @@ enum ActionInsertion {
         let actionStart = selection.location
         let caretOffset = actionStart + actionText.utf16.count
 
-        let includeBlock = includeBlock(in: replacedText)
-        guard let includePath = entry.category?.includePath, !includeBlock.paths.contains(includePath) else {
+        guard let includePath = entry.category?.includePath,
+              let includeAddition = addingInclude(includePath, to: replacedText) else {
             return ActionInsertionResult(text: replacedText, selection: NSRange(location: caretOffset, length: 0))
         }
 
-        let includeText = (includeBlock.lastLineLacksNewline ? "\n" : "") + "\(includeDirective) '\(includePath)'\n"
-        let textWithInclude = (replacedText as NSString).replacingCharacters(in: NSRange(location: includeBlock.endOffset, length: 0),
-                                                                             with: includeText)
-        let shiftedCaretOffset = includeBlock.endOffset <= actionStart ? caretOffset + includeText.utf16.count : caretOffset
-        return ActionInsertionResult(text: textWithInclude, selection: NSRange(location: shiftedCaretOffset, length: 0))
+        let shiftedCaretOffset = includeAddition.insertionOffset <= actionStart ? caretOffset + includeAddition.insertedLength : caretOffset
+        return ActionInsertionResult(text: includeAddition.text, selection: NSRange(location: shiftedCaretOffset, length: 0))
+    }
+
+    /// Adds the include below the last `#include` line and puts the caret at the start of the new line.
+    /// Returns `nil` when the text already includes the path.
+    static func addInclude(_ includePath: String, to text: String) -> ActionInsertionResult? {
+        guard let includeAddition = addingInclude(includePath, to: text) else { return nil }
+        return ActionInsertionResult(text: includeAddition.text, selection: NSRange(location: includeAddition.directiveOffset, length: 0))
+    }
+
+    /// The include path from the compiler's "requires include" error, `nil` for any other error.
+    static func requiredIncludePath(inCompilerError message: String) -> String? {
+        message.firstMatch(of: requiredIncludeErrorRegex).map { String($0.path) }
+    }
+
+    private static func addingInclude(_ includePath: String, to text: String) -> IncludeAddition? {
+        let includeBlock = includeBlock(in: text)
+        guard !includeBlock.paths.contains(includePath) else { return nil }
+
+        let leadingNewline = includeBlock.lastLineLacksNewline ? "\n" : ""
+        let includeText = leadingNewline + "\(includeDirective) '\(includePath)'\n"
+        let textWithInclude = (text as NSString).replacingCharacters(in: NSRange(location: includeBlock.endOffset, length: 0),
+                                                                     with: includeText)
+        return IncludeAddition(text: textWithInclude,
+                               insertionOffset: includeBlock.endOffset,
+                               directiveOffset: includeBlock.endOffset + leadingNewline.utf16.count,
+                               insertedLength: includeText.utf16.count)
     }
 
     /// The editor's saved selection can be stale, and a range outside the text would crash the replacement.
