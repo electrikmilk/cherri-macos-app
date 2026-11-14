@@ -110,10 +110,12 @@ struct ActionSearchView: View {
     @ViewBuilder
     private func subcategoryChips(of category: CherriActionCategory) -> some View {
         backButton(to: "all categories from \(category.title)")
+        chip(category.title, isSelected: selectedSubcategory == nil) {
+            selectedSubcategory = nil
+        }
         if !category.subcategories.isEmpty {
-            chip("All", isSelected: selectedSubcategory == nil) {
-                selectedSubcategory = nil
-            }
+            Divider()
+                .frame(height: 16)
             ForEach(category.subcategories, id: \.self) { subcategory in
                 chip(subcategory, isSelected: selectedSubcategory == subcategory) {
                     selectedSubcategory = subcategory
