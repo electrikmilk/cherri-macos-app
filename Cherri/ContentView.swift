@@ -119,6 +119,13 @@ struct ContentView: View {
                 toolbarGroupSeparator
 
                 ToolbarItem {
+                    Button("Search Actions", systemImage: "magnifyingglass", action: presentActionSearch)
+                        .help("Search actions (\u{21E7}\u{2318}A)")
+                }
+
+                toolbarGroupSeparator
+
+                ToolbarItem {
                     Button("Preview", systemImage: "sidebar.trailing") {
                         showPreview.toggle()
                     }
