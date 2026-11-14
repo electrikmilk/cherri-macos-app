@@ -230,6 +230,7 @@ struct ActionSearchView: View {
                 Image(systemName: "info.circle")
             }
             .buttonStyle(.borderless)
+            .tint(entry.id == selectedIdentifier ? .white : .accentColor)
             .keyboardShortcut(entry.id == selectedIdentifier ? KeyboardShortcut("i", modifiers: .command) : nil)
             .help("Show details")
             .accessibilityLabel("Details for \(entry.action.identifier)")
