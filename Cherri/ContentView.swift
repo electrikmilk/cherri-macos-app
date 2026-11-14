@@ -278,8 +278,10 @@ struct ContentView: View {
             compilerArguments.append("--share=anyone")
         }
 
+        // The compiler names the processed copy after the file name up to its first dot.
+        let compilerBasename = fileURL.lastPathComponent.split(separator: ".", omittingEmptySubsequences: false)[0]
         let processedSourceURL = workingDirectoryURL
-            .appendingPathComponent("\(fileURL.deletingPathExtension().lastPathComponent)_processed.cherri")
+            .appendingPathComponent("\(compilerBasename)_processed.cherri")
         let processedSourceExisted = FileManager.default.fileExists(atPath: processedSourceURL.path)
         defer {
             if !processedSourceExisted {
