@@ -26,6 +26,9 @@ struct ActionSearchView: View {
     @State private var selectedIdentifier: String?
     @State private var identifierShowingInfo: String?
     @FocusState private var searchFieldIsFocused: Bool
+    @Environment(\.controlActiveState) private var controlActiveState
+
+    private var windowIsActive: Bool { controlActiveState != .inactive }
 
     private static let allChipID = "all"
     private static let panelShape = RoundedRectangle(cornerRadius: 12, style: .continuous)
@@ -232,21 +235,22 @@ struct ActionSearchView: View {
     private func selectionBackground(isSelected: Bool) -> some View {
         if isSelected {
             RoundedRectangle(cornerRadius: 6, style: .continuous)
-                .fill(Color.accentColor)
+                .fill(windowIsActive ? Color.accentColor : Color(nsColor: .unemphasizedSelectedContentBackgroundColor))
                 .padding(.horizontal, 6)
         }
     }
 
     private func row(for entry: CherriActionEntry) -> some View {
         let isSelected = entry.id == selectedIdentifier
+        let isHighlighted = isSelected && windowIsActive
         return HStack {
             VStack(alignment: .leading, spacing: 2) {
                 Text(entry.action.identifier)
                     .font(.body.monospaced())
-                    .foregroundStyle(isSelected ? Color.white : Color.primary)
+                    .foregroundStyle(isHighlighted ? Color.white : Color.primary)
                 Text(entry.action.summary.isEmpty ? entry.action.title : entry.action.summary)
                     .font(.callout)
-                    .foregroundStyle(isSelected ? Color.white.opacity(0.8) : Color.secondary)
+                    .foregroundStyle(isHighlighted ? Color.white.opacity(0.8) : Color.secondary)
                     .lineLimit(1)
             }
             Spacer()
@@ -256,7 +260,7 @@ struct ActionSearchView: View {
                 Image(systemName: "info.circle")
             }
             .buttonStyle(.borderless)
-            .tint(isSelected ? .white : .accentColor)
+            .tint(isHighlighted ? .white : .accentColor)
             .keyboardShortcut(isSelected ? KeyboardShortcut("i", modifiers: .command) : nil)
             .help("Show details")
             .accessibilityLabel("Details for \(entry.action.identifier)")
