@@ -60,7 +60,11 @@ struct ActionSearchView: View {
         .task { await load() }
         .onAppear { searchFieldIsFocused = true }
         .onChange(of: visibleEntries.map(\.id)) { selectedIdentifier = visibleEntries.first?.id }
-        .onChange(of: selectedCategoryName) { selectedSubcategory = nil }
+        .onChange(of: selectedCategoryName) {
+            selectedSubcategory = nil
+            // The chip that was clicked is replaced, and the window can be left with a first responder that no longer exists.
+            searchFieldIsFocused = true
+        }
     }
 
     private var contents: CherriActionRegistry.Contents? {
