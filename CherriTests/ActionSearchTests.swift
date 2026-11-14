@@ -219,6 +219,12 @@ final class ActionSearchRankerTests: XCTestCase {
         XCTAssertEqual(rankedIdentifiers(for: "play"), ["playLater", "playNext", "skipTrack"])
     }
 
+    func testPunctuationInTheQueryIsIgnored() {
+        XCTAssertEqual(rankedIdentifiers(for: "get-pdf"), ["getPDFText"])
+        XCTAssertEqual(rankedIdentifiers(for: "get_pdf"), ["getPDFText"])
+        XCTAssertEqual(rankedIdentifiers(for: "getPDFText("), ["getPDFText"])
+    }
+
     func testNoMatchReturnsEmpty() {
         XCTAssertEqual(rankedIdentifiers(for: "zzzz"), [])
     }

@@ -15,8 +15,7 @@ enum ActionSearchRanker {
 
     /// An empty query returns every entry in its original order, otherwise only matching entries, best first.
     static func rank(_ entries: [CherriActionEntry], matching query: String) -> [CherriActionEntry] {
-        let lowercasedQuery = query.lowercased()
-        let tokens = lowercasedQuery.split(whereSeparator: \.isWhitespace).map { Array($0) }
+        let tokens = query.lowercased().split { !$0.isLetter && !$0.isNumber }.map { Array($0) }
         guard !tokens.isEmpty else { return entries }
 
         let identifierQuery = Array(tokens.joined())
