@@ -33,7 +33,7 @@ struct ContentView: View {
 
     @State private var unlocatedMessages: [UnlocatedMessage]        = []
     
-    @State private var showPopover:      Bool                      = false
+    @State private var isActionSearchPresented: Bool               = false
     
     @AppStorage("Cherri.showMinimap")
     private var showMinimap:             Bool                      = true
@@ -126,6 +126,17 @@ struct ContentView: View {
                 }
             }
         }
+        .overlay {
+            if isActionSearchPresented {
+                ZStack(alignment: .top) {
+                    Color.clear
+                        .contentShape(Rectangle())
+                        .onTapGesture(perform: dismissActionSearch)
+                    ActionSearchView(onInsert: insertAction, onDismiss: dismissActionSearch)
+                        .padding(.top, 40)
+                }
+            }
+        }
         .inspector(isPresented: $showPreview) {
             PreviewPane(controller: previewController, isBuilding: busy, hasPreview: hasPreview)
                 .inspectorColumnWidth(min: 280, ideal: 380, max: 600)
@@ -136,6 +147,23 @@ struct ContentView: View {
         }
     }
     
+    func presentActionSearch() {
+        isActionSearchPresented = true
+    }
+
+    private func dismissActionSearch() {
+        isActionSearchPresented = false
+        editorIsFocused = true
+    }
+
+    private func insertAction(_ entry: CherriActionEntry) {
+        let selection = editPosition.selections.first ?? NSRange(location: document.text.utf16.count, length: 0)
+        let result = ActionInsertion.insert(entry, into: document.text, replacing: selection)
+        document.text = result.text
+        editPosition.selections = [result.selection]
+        dismissActionSearch()
+    }
+
     /// Without a spacer, macOS 26 merges neighboring toolbar items into a single capsule.
     @ToolbarContentBuilder
     private var toolbarGroupSeparator: some ToolbarContent {

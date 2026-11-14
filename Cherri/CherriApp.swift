@@ -15,6 +15,9 @@ class EditorController: ObservableObject {
             await currentContentView?.compileFile()
         }
     }
+    func showActionSearch() {
+        currentContentView?.presentActionSearch()
+    }
     func buildAndOpen() {
         Task {
             guard let contentView = currentContentView else { return }
@@ -46,6 +49,13 @@ struct CherriApp: App {
                 }
                 .keyboardShortcut("r", modifiers: [.command])
                 .disabled((editorController.currentContentView == nil))
+            }
+            CommandGroup(after: .textEditing) {
+                Button("Search Actions...", systemImage: "magnifyingglass") {
+                    editorController.showActionSearch()
+                }
+                .keyboardShortcut("a", modifiers: [.command, .shift])
+                .disabled(editorController.currentContentView == nil)
             }
             CommandGroup(replacing: .help) {
                 Link("Documentation Site", destination: URL(string: "https://cherrilang.org/language/")!)
