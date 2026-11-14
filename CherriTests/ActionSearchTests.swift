@@ -158,11 +158,20 @@ final class ActionSearchRegistryTests: XCTestCase {
         XCTAssertEqual(registryIdentifiers.sorted(), catalogIdentifiers.sorted())
     }
 
-    func testOnlyActionsOutsideEveryCategoryAreUncategorized() async throws {
+    /// `--docs=` without a category lists every documented action, so what `--action=` has beyond it is uncategorized.
+    func testUncategorizedActionsAreExactlyTheOnesTheCompilerDoesNotDocument() async throws {
+        let documentedListing = try await CherriCatalog.run(["--docs=", "--no-ansi"])
+        let documentedIdentifiers = try CherriDocsParser.entries(fromDocs: documentedListing, category: "all")
+            .entries
+            .map(\.action.identifier)
+        let catalogIdentifiers = try await CherriCatalog.shared.entries().actions.map(\.identifier)
+        let expectedUncategorized = Set(catalogIdentifiers).subtracting(documentedIdentifiers)
+
         let entries = try await CherriActionRegistry.shared.contents().entries
         let uncategorizedIdentifiers = Set(entries.filter { $0.category == nil }.map(\.action.identifier))
 
-        XCTAssertEqual(uncategorizedIdentifiers, ["rawAction", "text", "makeVCard", "embedFile"])
+        XCTAssertFalse(expectedUncategorized.isEmpty)
+        XCTAssertEqual(uncategorizedIdentifiers, expectedUncategorized)
     }
 
     func testCategoriesComeFromTheCompilerHelp() async throws {
