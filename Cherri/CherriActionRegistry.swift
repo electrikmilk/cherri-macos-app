@@ -97,3 +97,54 @@ enum CherriDocsParser {
         return (category, entries)
     }
 }
+
+/// Categories and their actions come from the bundled compiler, separately from the autocomplete catalog.
+actor CherriActionRegistry {
+    static let shared = CherriActionRegistry()
+
+    struct Contents: Sendable {
+        let categories: [CherriActionCategory]
+        let entries: [CherriActionEntry]
+    }
+
+    private var loading: Task<Contents, Error>?
+
+    func contents() async throws -> Contents {
+        let task = loading ?? Task { try await Self.load() }
+        loading = task
+        do {
+            return try await task.value
+        } catch {
+            loading = nil
+            throw error
+        }
+    }
+
+    private static func load() async throws -> Contents {
+        let help = try await CherriCatalog.run(["--help", "--no-ansi"])
+        let categoryNames = try CherriDocsParser.categoryNames(fromHelp: help)
+
+        let documentedCategories = try await withThrowingTaskGroup(
+            of: (index: Int, category: CherriActionCategory, entries: [CherriActionEntry]).self
+        ) { group in
+            for (index, name) in categoryNames.enumerated() {
+                group.addTask {
+                    let docs = try await CherriCatalog.run(["--docs=\(name)", "--no-ansi"])
+                    let parsed = try CherriDocsParser.entries(fromDocs: docs, category: name)
+                    return (index, parsed.category, parsed.entries)
+                }
+            }
+            return try await group.reduce(into: []) { $0.append($1) }.sorted { $0.index < $1.index }
+        }
+
+        let documentedEntries = documentedCategories.flatMap(\.entries)
+        let documentedIdentifiers = Set(documentedEntries.map(\.action.identifier))
+        let uncategorizedEntries = try await CherriCatalog.shared.entries().actions
+            .filter { !documentedIdentifiers.contains($0.identifier) }
+            .map { CherriActionEntry(action: $0, category: nil, subcategory: nil) }
+
+        return Contents(categories: documentedCategories.map(\.category),
+                        entries: (documentedEntries + uncategorizedEntries)
+                            .sorted { $0.action.identifier.lowercased() < $1.action.identifier.lowercased() })
+    }
+}

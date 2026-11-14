@@ -123,7 +123,7 @@ actor CherriCatalog {
                                  glyphs: CherriCatalogParser.glyphs(from: glyphListing).sorted())
     }
 
-    private static func run(_ arguments: [String]) async throws -> String {
+    static func run(_ arguments: [String]) async throws -> String {
         guard let compilerURL = Bundle.main.url(forResource: "cherri_binary", withExtension: "") else {
             throw CherriCatalogError.compilerMissing
         }

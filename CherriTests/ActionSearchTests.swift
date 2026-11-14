@@ -139,3 +139,28 @@ final class ActionSearchDocsParserTests: XCTestCase {
         }
     }
 }
+
+/// These tests run the compiler bundled with the app, so they check the registry against what the app ships with.
+final class ActionSearchRegistryTests: XCTestCase {
+    func testRegistryListsEveryCompilerActionExactlyOnce() async throws {
+        let registryIdentifiers = try await CherriActionRegistry.shared.contents().entries.map(\.action.identifier)
+        let catalogIdentifiers = try await CherriCatalog.shared.entries().actions.map(\.identifier)
+
+        XCTAssertEqual(registryIdentifiers.sorted(), catalogIdentifiers.sorted())
+    }
+
+    func testOnlyActionsOutsideEveryCategoryAreUncategorized() async throws {
+        let entries = try await CherriActionRegistry.shared.contents().entries
+        let uncategorizedIdentifiers = Set(entries.filter { $0.category == nil }.map(\.action.identifier))
+
+        XCTAssertEqual(uncategorizedIdentifiers, ["rawAction", "text", "makeVCard", "embedFile"])
+    }
+
+    func testCategoriesComeFromTheCompilerHelp() async throws {
+        let categoryNames = try await CherriActionRegistry.shared.contents().categories.map(\.name)
+
+        XCTAssertTrue(categoryNames.contains("basic"))
+        XCTAssertTrue(categoryNames.contains("device"))
+        XCTAssertTrue(categoryNames.contains("text"))
+    }
+}
