@@ -50,7 +50,10 @@ struct ActionSearchView: View {
         .task { await load() }
         .onAppear { searchFieldIsFocused = true }
         .onChange(of: visibleEntries.map(\.id)) { selectedIdentifier = visibleEntries.first?.id }
-        .onChange(of: selectedCategoryName) { selectedSubcategory = nil }
+        .onChange(of: selectedCategoryName) { _, categoryName in
+            selectedSubcategory = nil
+            scrollChipRow(afterCategoryChangedTo: categoryName)
+        }
     }
 
     private var contents: CherriActionRegistry.Contents? {
@@ -150,13 +153,19 @@ struct ActionSearchView: View {
     /// The category row's scroll position is restored on the way back, and the subcategory row always starts at the left.
     private func open(_ category: CherriActionCategory) {
         categoryRowScrollTarget = chipScrollTarget
-        chipScrollTarget = Self.backButtonID
         selectedCategoryName = category.name
     }
 
     private func closeCategory() {
         selectedCategoryName = nil
-        chipScrollTarget = categoryRowScrollTarget
+    }
+
+    /// Scrolling in a later update than the swap, because the row is still short in the update that swaps it and a
+    /// position further right than that would be clamped to the left.
+    private func scrollChipRow(afterCategoryChangedTo categoryName: String?) {
+        withAnimation(.smooth(duration: 0.35)) {
+            chipScrollTarget = categoryName == nil ? categoryRowScrollTarget : Self.backButtonID
+        }
     }
 
     @ViewBuilder
