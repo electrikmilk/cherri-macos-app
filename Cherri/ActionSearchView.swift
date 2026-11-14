@@ -97,6 +97,7 @@ struct ActionSearchView: View {
                         HStack(spacing: 6) { subcategoryChips(of: selectedCategory) }
                             .padding(.horizontal, 12)
                     }
+                    .transition(.move(edge: .trailing).combined(with: .opacity))
                 } else {
                     ScrollView(.horizontal, showsIndicators: false) {
                         HStack(spacing: 6) { categoryChips(of: contents.categories) }
@@ -104,8 +105,10 @@ struct ActionSearchView: View {
                             .padding(.horizontal, 12)
                     }
                     .scrollPosition(id: $categoryScrollTarget, anchor: .leading)
+                    .transition(.move(edge: .leading).combined(with: .opacity))
                 }
             }
+            .animation(.smooth(duration: 0.3), value: selectedCategoryName)
             .padding(.vertical, 8)
         }
     }
@@ -184,6 +187,7 @@ struct ActionSearchView: View {
         }
         .buttonStyle(.plain)
         .glassEffect(isSelected ? .regular.tint(.accentColor).interactive() : .regular.interactive(), in: .capsule)
+        .animation(.snappy, value: isSelected)
         .accessibilityAddTraits(isSelected ? .isSelected : [])
     }
 
