@@ -284,6 +284,11 @@ struct ActionSearchView: View {
         }
     }
 
+    private func infoButtonTint(isHighlighted: Bool) -> Color {
+        guard windowIsActive else { return .secondary }
+        return isHighlighted ? .white : .accentColor
+    }
+
     private func row(for entry: CherriActionEntry) -> some View {
         let isSelected = entry.id == selectedIdentifier
         let isHighlighted = isSelected && windowIsActive
@@ -304,7 +309,7 @@ struct ActionSearchView: View {
                 Image(systemName: "info.circle")
             }
             .buttonStyle(.borderless)
-            .tint(isHighlighted ? .white : .accentColor)
+            .tint(infoButtonTint(isHighlighted: isHighlighted))
             .keyboardShortcut(isSelected ? KeyboardShortcut("i", modifiers: .command) : nil)
             .help("Show details")
             .accessibilityLabel("Details for \(entry.action.identifier)")
