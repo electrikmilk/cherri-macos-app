@@ -30,8 +30,6 @@ struct ContentView: View {
     @SceneStorage("editPosition") private var editPosition: CodeEditor.Position = CodeEditor.Position()
     
     @State private var messages:         Set<TextLocated<Message>> = Set ()
-
-    @State private var unlocatedMessages: [UnlocatedMessage]        = []
     
     @State private var isActionSearchPresented: Bool               = false
     
@@ -70,11 +68,7 @@ struct ContentView: View {
                     .fontWeight(.bold)
                     .padding(EdgeInsets(top: 12, leading: 0, bottom: 5, trailing: 0))
                 }
-
-                if !unlocatedMessages.isEmpty {
-                    unlocatedMessagesBanner
-                }
-
+                
                 CodeEditor(text: $document.text,
                            position: $editPosition,
                            messages: $messages,
@@ -169,28 +163,6 @@ struct ContentView: View {
 
     private var warningCount: Int {
         messages.filter { $0.entity.category == .warning }.count
-            + unlocatedMessages.filter { $0.category == .warning }.count
-    }
-
-    /// Messages the compiler gave no line and column for cannot be placed in the editor.
-    private var unlocatedMessagesBanner: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: 8) {
-                ForEach(unlocatedMessages) { message in
-                    HStack(alignment: .firstTextBaseline, spacing: 8) {
-                        Image(systemName: message.category == .error ? "xmark.octagon.fill" : "exclamationmark.triangle.fill")
-                            .foregroundStyle(message.category == .error ? .red : .orange)
-                        Text(message.text)
-                            .textSelection(.enabled)
-                        Spacer(minLength: 0)
-                    }
-                }
-            }
-            .padding(.horizontal, 12)
-            .padding(.vertical, 8)
-        }
-        .frame(maxHeight: 140)
-        .background(.quaternary)
     }
 
     @ViewBuilder
@@ -265,7 +237,6 @@ struct ContentView: View {
         parseFilepath()
 
         messages.removeAll()
-        unlocatedMessages.removeAll()
 
         do {
             try await buildShortcut(fileURL: fileURL)
@@ -386,31 +357,26 @@ struct ContentView: View {
     }
 
     func createMessage(message: String, summary: String, category: Message.Category) {
-        let content = message.trimmingCharacters(in: .whitespacesAndNewlines)
-
-        guard let location = try? /\((\d+):(\d+)\)$/.firstMatch(in: content),
-              let line = Int(location.1),
-              let column = Int(location.2)
-        else {
-            unlocatedMessages.append(UnlocatedMessage(category: category, text: content))
-            return
+        let lineColSearch = /(\d+):(\d+)/
+        var messageContent = message
+        var line = "1"
+        var col = "1"
+        if let result = try? lineColSearch.firstMatch(in: messageContent) {
+            line = "\(result.1)"
+            col = "\(result.2)"
+            
+            let replaceLineCol = " ("+line+":"+col+")"
+            messageContent = messageContent.replacingOccurrences(of: replaceLineCol, with: "")
         }
-
-        let description = content
-            .replacingOccurrences(of: " (\(line):\(column))", with: "")
-            .trimmingCharacters(in: .whitespacesAndNewlines)
-        messages.insert(TextLocated(location: TextLocation(oneBasedLine: line, column: column),
+        
+        messageContent = messageContent.trimmingCharacters(in: NSCharacterSet.whitespacesAndNewlines)
+        
+        messages.insert(TextLocated(location: TextLocation(oneBasedLine: Int(line) ?? 1, column: Int(col) ?? 1),
                                     entity: Message(category: category,
                                                     length: 1,
                                                     summary: summary,
-                                                    description: AttributedString(description))))
+                                                    description: AttributedString(messageContent))))
     }
-}
-
-private struct UnlocatedMessage: Identifiable {
-    let id = UUID()
-    let category: Message.Category
-    let text: String
 }
 
 private enum BuildError: LocalizedError {
