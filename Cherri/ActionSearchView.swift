@@ -20,11 +20,14 @@ struct ActionSearchView: View {
     @State private var loadState: LoadState = .loading
     @State private var query = ""
     @State private var selectedCategoryName: String?
+    /// Kept here because the category row is removed while a category is open, and it should return where it was.
+    @State private var categoryScrollTarget: String?
     @State private var selectedSubcategory: String?
     @State private var selectedIdentifier: String?
     @State private var identifierShowingInfo: String?
     @FocusState private var searchFieldIsFocused: Bool
 
+    private static let allChipID = "all"
     private static let panelShape = RoundedRectangle(cornerRadius: 12, style: .continuous)
 
     var body: some View {
@@ -83,15 +86,20 @@ struct ActionSearchView: View {
     @ViewBuilder
     private var categoryBar: some View {
         if let contents {
-            ScrollView(.horizontal, showsIndicators: false) {
-                HStack(spacing: 6) {
-                    if let selectedCategory = contents.categories.first(where: { $0.name == selectedCategoryName }) {
-                        subcategoryChips(of: selectedCategory)
-                    } else {
-                        categoryChips(of: contents.categories)
+            Group {
+                if let selectedCategory = contents.categories.first(where: { $0.name == selectedCategoryName }) {
+                    ScrollView(.horizontal, showsIndicators: false) {
+                        HStack(spacing: 6) { subcategoryChips(of: selectedCategory) }
+                            .padding(.horizontal, 12)
                     }
+                } else {
+                    ScrollView(.horizontal, showsIndicators: false) {
+                        HStack(spacing: 6) { categoryChips(of: contents.categories) }
+                            .scrollTargetLayout()
+                            .padding(.horizontal, 12)
+                    }
+                    .scrollPosition(id: $categoryScrollTarget, anchor: .leading)
                 }
-                .padding(.horizontal, 12)
             }
             .padding(.vertical, 8)
         }
@@ -100,6 +108,7 @@ struct ActionSearchView: View {
     @ViewBuilder
     private func categoryChips(of categories: [CherriActionCategory]) -> some View {
         chip("All", isSelected: true) {}
+            .id(Self.allChipID)
         ForEach(categories, id: \.name) { category in
             chip(category.title, isSelected: false) {
                 selectedCategoryName = category.name
