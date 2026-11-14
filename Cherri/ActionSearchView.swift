@@ -38,8 +38,10 @@ struct ActionSearchView: View {
     private static let chipContentSpace = "chipContent"
     private static let chipRowMargin: CGFloat = 12
 
+    private static let categoryChipIDPrefix = "category:"
+
     private static func chipID(ofCategoryNamed name: String) -> String {
-        "category:\(name)"
+        "\(categoryChipIDPrefix)\(name)"
     }
 
     private static func chipID(ofSubcategory name: String) -> String {
@@ -129,7 +131,8 @@ struct ActionSearchView: View {
         }
     }
 
-    /// The back button and the chip for the whole category stay put, and only the subcategories scroll beneath them.
+    /// The back button and the chip for the whole category stay put, and only the subcategories scroll. Glass is drawn per
+    /// container, so the scrolling chips get a container of their own inside the scroll view, where the scroll view clips them.
     private func subcategoryBar(for category: CherriActionCategory) -> some View {
         HStack(spacing: 0) {
             HStack(spacing: 6) {
@@ -144,14 +147,14 @@ struct ActionSearchView: View {
             }
             .padding(.leading, Self.chipRowMargin)
             .padding(.trailing, 6)
-            .background(.background)
-            .zIndex(1)
             if !category.subcategories.isEmpty {
                 ScrollView(.horizontal, showsIndicators: false) {
-                    HStack(spacing: 6) {
-                        ForEach(category.subcategories.map { (id: Self.chipID(ofSubcategory: $0), name: $0) }, id: \.id) { id, subcategory in
-                            chip(subcategory, id: id, isSelected: selectedSubcategory == subcategory) {
-                                selectedSubcategory = subcategory
+                    glassContainer {
+                        HStack(spacing: 6) {
+                            ForEach(category.subcategories.map { (id: Self.chipID(ofSubcategory: $0), name: $0) }, id: \.id) { id, subcategory in
+                                chip(subcategory, id: id, isSelected: selectedSubcategory == subcategory) {
+                                    selectedSubcategory = subcategory
+                                }
                             }
                         }
                     }
@@ -232,7 +235,13 @@ struct ActionSearchView: View {
 
     private func chip(_ title: String, id: String, isSelected: Bool, select: @escaping () -> Void) -> some View {
         chipBody(title, id: id, isSelected: isSelected, select: select)
-            .onGeometryChange(for: CGRect.self) { $0.frame(in: .named(Self.chipContentSpace)) } action: { chipFrames[id] = $0 }
+            .onGeometryChange(for: CGRect.self) { $0.frame(in: .named(Self.chipContentSpace)) } action: { recordCategoryRowFrame($0, ofChip: id) }
+    }
+
+    /// Only the category row's own layout is wanted, and writing state for chips that move during the morph would update the glass every frame.
+    private func recordCategoryRowFrame(_ frame: CGRect, ofChip id: String) {
+        guard selectedCategoryName == nil, id.hasPrefix(Self.categoryChipIDPrefix) else { return }
+        chipFrames[id] = frame
     }
 
     @ViewBuilder
