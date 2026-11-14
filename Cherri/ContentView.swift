@@ -165,8 +165,10 @@ struct ContentView: View {
             HStack {
                 Text("Unable to compile Shortcut.")
                     .fontWeight(.bold)
+                    .lineLimit(1)
+                    .layoutPriority(1)
 
-                Spacer()
+                Spacer(minLength: 0)
 
                 if let missingIncludePath {
                     missingIncludeFix(missingIncludePath)
@@ -183,17 +185,29 @@ struct ContentView: View {
         .padding(.top, 12)
     }
 
+    /// Stays on one line so a narrow editor column can't grow the banner taller than the window, where it would
+    /// spill up under the toolbar. The explanation is dropped when it doesn't fit.
     private func missingIncludeFix(_ includePath: String) -> some View {
-        HStack {
-            Text("This file is missing #include '\(includePath)'")
-            Button("Fix", systemImage: "hammer.fill") {
-                addMissingInclude(includePath)
+        ViewThatFits(in: .horizontal) {
+            HStack {
+                Text("Missing #include '\(includePath)'")
+                    .lineLimit(1)
+                    .fixedSize()
+                missingIncludeFixButton(includePath)
             }
-            .buttonStyle(.bordered)
-            .controlSize(.small)
-            .disabled(busy)
-            .help("Add #include '\(includePath)' to this file and build again")
+            missingIncludeFixButton(includePath)
         }
+    }
+
+    private func missingIncludeFixButton(_ includePath: String) -> some View {
+        Button("Fix", systemImage: "hammer.fill") {
+            addMissingInclude(includePath)
+        }
+        .buttonStyle(.bordered)
+        .controlSize(.small)
+        .fixedSize()
+        .disabled(busy)
+        .help("Add #include '\(includePath)' to this file and build again")
     }
 
     private func addMissingInclude(_ includePath: String) {
