@@ -281,6 +281,22 @@ final class ActionInsertionTests: XCTestCase {
         XCTAssertEqual(result.selection, NSRange(location: "define(".utf16.count, length: 0))
     }
 
+    func testIndentedExistingIncludeIsNotDuplicated() {
+        for existingInclude in ["  #include 'actions/text'\n", "\t#include 'actions/text'\n"] {
+            let result = ActionInsertion.insert(define, into: existingInclude, replacing: endOfText(existingInclude))
+
+            XCTAssertEqual(result.text, existingInclude + "define(")
+        }
+    }
+
+    func testIncludeGoesBelowAnIndentedIncludeLine() {
+        let text = "  #include 'actions/device'\nx\n"
+
+        let result = ActionInsertion.insert(define, into: text, replacing: endOfText(text))
+
+        XCTAssertEqual(result.text, "  #include 'actions/device'\n#include 'actions/text'\nx\ndefine(")
+    }
+
     func testExistingIncludeIsNotDuplicated() {
         for existingInclude in ["#include \"actions/text\"\n", "#include   'actions/text'\n"] {
             let result = ActionInsertion.insert(define, into: existingInclude, replacing: endOfText(existingInclude))

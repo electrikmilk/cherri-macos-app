@@ -54,9 +54,10 @@ enum ActionInsertion {
         var paths: [String] = []
         var endOffset = 0
         nsText.enumerateSubstrings(in: NSRange(location: 0, length: nsText.length), options: .byLines) { line, _, enclosingRange, _ in
-            guard let line, line.hasPrefix(includeDirective) else { return }
+            let unindentedLine = line?.drop { $0.isWhitespace }
+            guard let unindentedLine, unindentedLine.hasPrefix(includeDirective) else { return }
             endOffset = NSMaxRange(enclosingRange)
-            if let match = line.prefixMatch(of: includePathRegex) {
+            if let match = unindentedLine.prefixMatch(of: includePathRegex) {
                 paths.append(String(match.path))
             }
         }
