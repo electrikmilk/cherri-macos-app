@@ -41,7 +41,8 @@ struct ContentView: View {
     
     @State private var hasError:         Bool                      = false
     @State private var hasWarnings:      Bool                      = false
-    @State private var busy:             Bool                      = false
+    @State private var missingIncludePath: String?                 = nil
+    @State private var busy:            Bool                      = false
     @State private var compiled:         Bool                      = false
     @State private var hasPreview:       Bool                      = false
 
@@ -64,6 +65,13 @@ struct ContentView: View {
                         Image(systemName: "exclamationmark.triangle.fill")
                             .foregroundColor(.red)
                         Text("Unable to compile Shortcut.")
+                        if let missingIncludePath {
+                            Button("Fix", systemImage: "hammer.fill") {
+                                addMissingInclude(missingIncludePath)
+                            }
+                            .disabled(busy)
+                            .help("Add #include '\(missingIncludePath)'")
+                        }
                     }
                     .fontWeight(.bold)
                     .padding(EdgeInsets(top: 12, leading: 0, bottom: 5, trailing: 0))
@@ -153,6 +161,16 @@ struct ContentView: View {
         isActionSearchPresented = false
     }
 
+    private func addMissingInclude(_ includePath: String) {
+        if let result = ActionInsertion.addInclude(includePath, to: document.text) {
+            document.text = result.text
+            editPosition.selections = [result.selection]
+        }
+        Task {
+            await compileFile()
+        }
+    }
+
     /// Without a spacer, macOS 26 merges neighboring toolbar items into a single capsule.
     @ToolbarContentBuilder
     private var toolbarGroupSeparator: some ToolbarContent {
@@ -233,6 +251,7 @@ struct ContentView: View {
         hasError = false
         hasWarnings = false
         hasPreview = false
+        missingIncludePath = nil
 
         parseFilepath()
 
@@ -333,6 +352,7 @@ struct ContentView: View {
             let errorMessage = output.firstMatch(of: locatedErrorSearch).map { String($0.message) }
                 ?? output.firstMatch(of: errorSearch).map { String($0.message) }
             if let errorMessage {
+                missingIncludePath = ActionInsertion.requiredIncludePath(inCompilerError: errorMessage)
                 createMessage(message: errorMessage, summary: "Error", category: Message.Category.error)
             }
         }
