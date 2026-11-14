@@ -182,7 +182,6 @@ struct ContentView: View {
         .fixedSize(horizontal: false, vertical: true)
         .background(isDarkTheme ? Color.black : Color.white, ignoresSafeAreaEdges: [])
         .foregroundStyle(isDarkTheme ? Color.white : Color.black)
-        .padding(.top, 12)
     }
 
     /// Stays on one line so a narrow editor column can't grow the banner taller than the window, where it would
