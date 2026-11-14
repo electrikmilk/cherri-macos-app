@@ -109,15 +109,7 @@ struct ActionSearchView: View {
 
     @ViewBuilder
     private func subcategoryChips(of category: CherriActionCategory) -> some View {
-        Button {
-            selectedCategoryName = nil
-        } label: {
-            Label("Categories", systemImage: "chevron.left")
-        }
-        .buttonStyle(.borderless)
-        .help("Back to all categories")
-        Text(category.title)
-            .font(.headline)
+        backButton(to: "all categories from \(category.title)")
         if !category.subcategories.isEmpty {
             chip("All", isSelected: selectedSubcategory == nil) {
                 selectedSubcategory = nil
@@ -127,6 +119,29 @@ struct ActionSearchView: View {
                     selectedSubcategory = subcategory
                 }
             }
+        }
+    }
+
+    @ViewBuilder
+    private func backButton(to destination: String) -> some View {
+        let leaveCategory = { selectedCategoryName = nil }
+        if #available(macOS 26, *) {
+            Button(action: leaveCategory) {
+                Image(systemName: "chevron.left")
+                    .fontWeight(.semibold)
+                    .frame(width: 28, height: 28)
+            }
+            .buttonStyle(.plain)
+            .glassEffect(.regular.interactive(), in: .circle)
+            .help("Back to \(destination)")
+            .accessibilityLabel("Back")
+        } else {
+            Button(action: leaveCategory) {
+                Image(systemName: "chevron.left")
+            }
+            .buttonStyle(.borderless)
+            .help("Back to \(destination)")
+            .accessibilityLabel("Back")
         }
     }
 
@@ -144,18 +159,16 @@ struct ActionSearchView: View {
     }
 
     @available(macOS 26, *)
-    @ViewBuilder
     private func glassChip(_ title: String, isSelected: Bool, select: @escaping () -> Void) -> some View {
-        let button = Button(title, action: select)
-            .buttonBorderShape(.capsule)
-            .controlSize(.small)
-            .tint(.red)
-            .accessibilityAddTraits(isSelected ? .isSelected : [])
-        if isSelected {
-            button.buttonStyle(.glassProminent)
-        } else {
-            button.buttonStyle(.glass)
+        Button(action: select) {
+            Text(title)
+                .padding(.horizontal, 14)
+                .padding(.vertical, 6)
+                .foregroundStyle(isSelected ? Color.white : Color.primary)
         }
+        .buttonStyle(.plain)
+        .glassEffect(isSelected ? .regular.tint(.red).interactive() : .regular.interactive(), in: .capsule)
+        .accessibilityAddTraits(isSelected ? .isSelected : [])
     }
 
     // MARK: Results
