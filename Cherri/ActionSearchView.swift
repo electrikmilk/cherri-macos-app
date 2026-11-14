@@ -268,6 +268,7 @@ struct ActionSearchView: View {
                 ActionInfoView(entry: entry)
             }
         }
+        .padding(.vertical, 6)
     }
 
     private func isShowingInfo(for entry: CherriActionEntry) -> Binding<Bool> {
