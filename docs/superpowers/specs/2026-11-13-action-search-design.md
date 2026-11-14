@@ -39,12 +39,13 @@ Add a dedicated action search to the Cherri macOS app. It lists actions, lets th
 - Each action belongs to exactly one category, so the include line added is that category's.
 - The overlay opens only from a focused document window, so the editor always exists. The menu command is disabled when no document window is focused.
 - A keyboard shortcut opens the overlay and Escape closes it. The search field has focus on open. Arrow keys move through results and Return inserts the selected action at the editor cursor, then closes the overlay.
-- Category chips with an "All" chip. A second row of chips appears for categories with subcategories.
+- A category picker with an "All" option. A second picker appears for categories with subcategories.
+- The user asked that the UI follow Apple's Human Interface Guidelines using standard SwiftUI controls and system styling, with nothing custom unless needed.
 - Each row shows the identifier and a one-line description.
 - An (i) button, or a shortcut, opens a popover with the signature, notes and the include line the action needs.
 - Inserted text matches autocomplete: `name(` or `name()`.
 - Skip adding an include that is already present in the file, and skip it for the basic category.
-- Where the include line is placed in the file.
+- The include line goes directly below the last existing `#include` line, or at the very top of the file when there is none. This matches the compiler's own sample files, which put includes first. An include is treated as present when the file already includes the same path, with either quote style.
 
 ## Non-goals
 
