@@ -16,6 +16,13 @@ Create, edit, save, open, duplicate, rename, etc. Cherri files.
 - 🔨 **Build:** Compile the current Cherri file into a Shortcut.
 - ▶️ **Run:** Compile, then open the compiled Shortcut.
 
+### Action search
+
+Search for an action and insert it into your code. Open it with **Edit -> Search Actions...** (**⇧⌘A**) or the search button in the toolbar. Type to search, or browse by category. Press **Return** to insert the selected action. If it needs an include, the include is added automatically.
+
+![Action search with category chips](docs/images/action-search.png)
+![Action search results for a query](docs/images/action-search-results.png)
+
 ### Import from iCloud
 
 Convert an existing Shortcut to Cherri code. Go to **File -> Import Shortcut...** (**⌘I**), paste the Shortcut's iCloud link and click **Import**. The Shortcut is converted and opened as a new Cherri document.
