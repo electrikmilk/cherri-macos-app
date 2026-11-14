@@ -149,6 +149,7 @@ struct ContentView: View {
     }
 
     /// Uses the colors of the editor's inline error popups: the error red at 30% over black or white, with a 50% icon block.
+    /// The backgrounds stay inside the safe area, otherwise they paint under the window toolbar.
     private var compileErrorBanner: some View {
         let errorRed = Color(nsColor: .red)
         let isDarkTheme = theme == .dark
@@ -157,7 +158,7 @@ struct ContentView: View {
             Image(systemName: "xmark.octagon.fill")
                 .padding(.horizontal, 10)
                 .frame(maxHeight: .infinity)
-                .background(errorRed.opacity(0.5))
+                .background(errorRed.opacity(0.5), ignoresSafeAreaEdges: [])
 
             HStack {
                 Text("Unable to compile Shortcut.")
@@ -172,10 +173,10 @@ struct ContentView: View {
             .padding(.horizontal, 10)
             .padding(.vertical, 6)
             .frame(maxWidth: .infinity)
-            .background(errorRed.opacity(0.3))
+            .background(errorRed.opacity(0.3), ignoresSafeAreaEdges: [])
         }
         .fixedSize(horizontal: false, vertical: true)
-        .background(isDarkTheme ? Color.black : Color.white)
+        .background(isDarkTheme ? Color.black : Color.white, ignoresSafeAreaEdges: [])
         .foregroundStyle(isDarkTheme ? Color.white : Color.black)
     }
 
